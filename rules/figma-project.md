@@ -31,6 +31,14 @@ Text never matches pixel for pixel, because Figma and browsers rasterise glyphs 
 
 Build the screens that were asked for. Add a token or component only when one of those screens uses it. Leave unrelated code alone.
 
+## Foundation before screens
+
+Always establish the reusable foundation first:
+1. Extract design tokens (colors, typography, spacing, radii, shadows) into `tokens.css` or the project's theme config.
+2. Build base element defaults and typography in `base.css`.
+3. Create reusable UI primitives (buttons, badges, inputs, cards) as Blade components before building screen sections.
+No section may hardcode values or recreate component patterns that belong in the foundation.
+
 ## Derived decisions
 
 Anything the design does not specify (a breakpoint with no frame, an error state, a hover style) is a derived decision. Mark it in the code with a comment starting `derived:` and list it in the screen's doc, so a designer can review every one by searching for that word.

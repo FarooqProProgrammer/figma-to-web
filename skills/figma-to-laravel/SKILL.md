@@ -52,16 +52,37 @@ Hand each screen to the `figma-to-web:figma-inspector` agent with its frame URLs
 
 For several screens, run the inspectors in parallel, then build the foundation from all the specs before building any screen, so the tokens are consistent across them.
 
-## 2. Build the shared foundation
+## 2. Build the reusable foundation & tokens first (MANDATORY BEFORE SCREENS)
 
-Map tokens from the spec's variables and styles (`colors`, `fonts`, `spacing`, `radii`, `shadows`):
-- **Tailwind CSS setup**: extend `tailwind.config.js` or CSS `@theme` with the Figma tokens.
-- **Bootstrap setup**: override Bootstrap SCSS/CSS custom properties or add token utility classes.
-- **Custom CSS setup**: write `tokens.css` with custom properties (`--color-*`, `--font-*`, `--space-*`, etc.).
+**Strict Rule**: Never implement individual page sections or views before extracting and establishing the shared foundation. All recurring styles, design tokens, and UI primitives must live at the top level so sections consume them without duplicating or hardcoding raw values.
 
-Then create Blade components for elements that are Figma components or recur. Add only what these screens use.
+### A. Global Design Tokens
+Extract all Figma variables and styles into a single source of truth:
+- **Colors**: Brand primaries, neutrals, background, surface, borders, status colors, and gradients (`--color-*`).
+- **Typography Scale**: Font families, weights, font sizes (in `rem`), exact line-height ratios (`calc(...)`), letter spacing (`em`), and text colors for headings (H1–H6), body, captions, and links.
+- **Spacing Scale**: Consistent spacing scale for margins, paddings, and gaps (`--space-1`, `--space-2`, `--space-4`, etc.).
+- **Border Radii**: Corner curves for buttons, cards, badges, and modals (`--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-full`).
+- **Elevation & Shadows**: Box shadows, drop shadows, and blur filters (`--shadow-sm`, `--shadow-md`, `--shadow-lg`).
 
-If tokens and components already exist, reuse them. When a Figma value contradicts an existing token, find out whether the design changed or the token was wrong before editing it, because other screens depend on it.
+**Implementation according to project stack**:
+- **Tailwind CSS**: Extend `tailwind.config.js` or CSS `@theme` block with all Figma tokens.
+- **Bootstrap**: Override Bootstrap SCSS/CSS variables (`$theme-colors`, `$font-sizes`, `--bs-*`) or add utility token mappings.
+- **Custom CSS**: Write `resources/css/tokens.css` with `:root` CSS custom properties.
+
+### B. Base Styles (`resources/css/base.css`)
+- Global `box-sizing: border-box` reset.
+- Body defaults: background color, default typography, `-webkit-font-smoothing: antialiased`, and `-moz-osx-font-smoothing: grayscale`.
+- Heading and paragraph default margins and font hierarchies.
+
+### C. Reusable UI Primitives (Blade Components)
+Before writing any screen view, build the reusable Blade components and component stylesheets for elements that appear across multiple sections:
+- **Buttons** (`<x-button variant="primary|secondary|outline" size="sm|md|lg">`): Shared `.btn` styles, modifier classes, hover/active/focus-visible states.
+- **Badges / Chips / Pills** (`<x-badge variant="...">`).
+- **Form Controls** (Inputs, textareas, selects, checkboxes with consistent focus and validation states).
+- **Cards & Shells** (`<x-card>` containers with standard padding, border, and shadow).
+- **Icons & Avatars**: Reusable SVG icon components or asset helpers.
+
+If tokens and components already exist in the codebase, reuse them. When a Figma value contradicts an existing token, determine whether the design was updated or the token was inaccurate before altering it.
 
 ## 3. Build the screen at the widest frame
 

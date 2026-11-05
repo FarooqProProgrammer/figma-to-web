@@ -48,10 +48,15 @@ When tasked with building or updating a screen:
 - Export 1x reference images to `docs/design/<screen>/reference/<screen>-<width>.png` (or `docs/design/reference/`).
 - Output the design specification to `docs/design/<screen>/spec.md` (or `docs/design/<screen>.md`).
 
-### Step 2: Build Tokens & Shared Components
-- Build `resources/css/tokens.css` from the spec variables and styles (`--color-*`, `--font-*`, `--space-*`, `--radius-*`, `--shadow-*`).
-- Font sizes in `rem` (`px / 16`), line heights as exact ratios (`calc(22 / 14)`), letter spacing in `em` (`percent / 100`), other dimensions in `px`.
-- Build reusable Blade components (`resources/views/components/<name>.blade.php` and `resources/css/components/<name>.css`).
+### Step 2: Build Reusable Foundation & Primitives First (Mandatory Before Screens)
+- **Strict Foundation Rule**: Never build individual sections or views with hardcoded values. Extract and implement the shared foundation at the top level first:
+  1. **Global Tokens** (`resources/css/tokens.css` or Tailwind `@theme` or Bootstrap variables):
+     - Colors (`--color-*`), Typography scale (`--font-*` with `rem` sizes, `calc()` line-height ratios, `em` letter-spacing), Spacing (`--space-*`), Border Radii (`--radius-*`), and Elevation/Shadows (`--shadow-*`).
+  2. **Base Styles** (`resources/css/base.css`):
+     - Box-sizing reset, font antialiasing (`-webkit-font-smoothing: antialiased`), body defaults, and baseline element typography.
+  3. **Reusable Blade Components & Primitives**:
+     - Buttons (`<x-button>`, `.btn`, `.btn--primary`, `.btn--outline`, focus/active states), Badges/Pills (`<x-badge>`), Form Controls (inputs, selects), and Cards (`<x-card>`).
+  - Screen views must consume these reusable tokens and components rather than re-declaring them.
 
 ### Step 3: Implement Screen & Responsive Reflow
 - Implement the widest Figma frame first in `resources/views/screens/<name>.blade.php` and `resources/css/screens/<name>.css`.

@@ -32,6 +32,13 @@ A component's Blade file, CSS file and root class share one name: `button.blade.
 
 Make something a component when it is a component in Figma or appears in more than one place. Everything else stays as markup in the screen's view.
 
+## Reusable Styles & Primitives First
+
+**Mandatory Sequence**: All reusable styles must be extracted and declared at the top level before implementing any individual page section:
+1. **Design Tokens**: Every color, font style, spacing unit, corner radius, and shadow used in Figma must be declared in `tokens.css` (or Tailwind `@theme`). Never hardcode hex codes or raw pixel sizes inside section stylesheets.
+2. **Base Styles**: Element defaults, resets, and font antialiasing are set once in `base.css`.
+3. **Component Primitives**: Elements that recur across screens or sections (buttons, badges, pills, form inputs, cards) must be built as standalone Blade components (`resources/views/components/`) and component styles (`resources/css/components/`) before page-level views are written. Sections must simply consume these components.
+
 ## Tokens
 
 Name tokens after the Figma variable or style they come from: `--color-*`, `--font-*`, `--space-*`, `--radius-*`, `--shadow-*`. Component and screen CSS refers to tokens for anything Figma defines as a variable or style. A one-off measurement that the design does not tokenise (an illustration's width, say) stays a literal value next to its use.
