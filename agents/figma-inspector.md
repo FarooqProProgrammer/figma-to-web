@@ -69,6 +69,7 @@ Write the overall screen specification with these sections:
 - **Tokens**: every variable and style the frames use, with its Figma name and value: colors, type styles (family, weight, size, line height, letter spacing), spacing, radii, shadows.
 - **Components**: each Figma component instance, its variants and properties, and where it appears.
 - **Layout**, per frame, as a tree that mirrors the node tree. For each node give its node ID and its position and size within the frame. For auto-layout nodes add the direction, gap, padding, alignment, wrap, and the sizing mode on each axis (hug, fill or fixed). For nodes outside auto layout add the constraints. For text nodes add the type style, color, resizing mode, vertical trim and the exact text. For shapes and containers add the fills in order, the stroke (width, position, and whether it is included in layout), radius, effects, opacity and blend mode.
+- **Section gaps**: for the page frame's children, the vertical gap between each pair of neighbouring sections at each frame width, and where it comes from (page item spacing, section padding, or the y positions when there is no auto layout).
 - **Differences between frames**: what stacks, hides, reorders or changes size from one breakpoint to the next. The engineer builds the media queries from this section.
 - **Assets**: each image, icon and illustration with its node ID, format and rendered size, and how it is cropped.
 - **Motion**: each animated node with its trigger, properties, duration and easing, and what the tool could not read.

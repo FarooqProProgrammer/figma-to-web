@@ -21,6 +21,20 @@ Always use Bootstrap's `.container` for page content width, in every project and
 
 When a Bootstrap class is used for something (`.container`, `.row`, `.col-*`, `.d-flex`, `.btn`, spacing or text utilities), delete every custom CSS rule that does the same job or could clash with it: a custom wrapper with `max-width` and `margin: 0 auto`, a hand-written grid or flex row, a duplicate `.btn` or `.card`, and any rule that re-sets `display`, `padding`, `margin`, `width` or `gap` on an element that already carries the Bootstrap class. One concern has one source: Bootstrap's class or the custom class, never both. Never define a custom class with a Bootstrap class name (`.container`, `.row`, `.col`, `.btn`, `.card`, `.badge`, `.type-body`, `.d-*`, `.m-*`, `.p-*`) except the single deliberate token override of that class described above; name custom classes with a distinct prefix or name instead (e.g. `.type-body`, `.ui-button`). Before finishing a screen, search the CSS for rules that target a Bootstrap class name or style an element that also has a Bootstrap utility, and remove or merge them. After removing, re-run `measure` and the sweep, because Bootstrap's own values now apply.
 
+## Section gaps match Figma (strict)
+
+The vertical gap between neighbouring sections equals the gap in Figma, within one pixel, at every frame width. Read it from Figma (the page frame's item spacing, the sections' own padding, or the difference in y positions when there is no auto layout), store it as a token (`--section-gap` or `--section-pad-y`), and apply it in one shared class in `layout.css`. Use one mechanism only, either a flex `gap` on the page wrapper or padding on each section, never both and never margins between sections. Prove it with `figma-check.mjs measure`: `next.top - prev.bottom` of each pair at each frame width. The `match-section-gaps` skill has the procedure.
+
+## Page CSS and shared CSS are separate files (strict)
+
+CSS that only one page uses goes in a file named after that page, `resources/css/screens/<page>.css` (`home.blade.php` with `screens/home.css`). CSS used by more than one page goes in separate shared files: `tokens.css`, `base.css`, `typography.css`, `layout.css` and `components/<name>.css`. Never put a page's own rules in a shared file, and never put a shared rule in a page file.
+
+- Prefix a page's class names with the page name (`.home-hero`) so they cannot leak onto other pages.
+- When a second page needs a rule that lives in the first page's file, move it to the right shared file in the same change; do not copy it.
+- A page file never restyles a shared component; add a variant to the component instead.
+- `app.css` imports shared files only. Each view loads its own page file with `@push('styles')` and `@vite`, and every page file is listed in `vite.config.js`.
+- The `split-page-and-shared-css` skill has the full procedure.
+
 ## File layout (for custom CSS projects)
 
 ```
@@ -28,8 +42,10 @@ resources/css/
   app.css                  only @import lines, in the order below
   tokens.css               custom properties from Figma variables and styles
   base.css                 reset, element defaults, @font-face
+  typography.css          shared text classes (.type-h1, .type-body, ...)
+  layout.css              shared: the .container override and section spacing
   components/<name>.css    one file per Blade component
-  screens/<name>.css       one file per screen
+  screens/<page>.css       CSS unique to that one page, named after the page
 resources/views/
   components/layout.blade.php     shared page shell, used as <x-layout>
   components/<name>.blade.php     anonymous Blade components

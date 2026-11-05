@@ -6,6 +6,9 @@ This project turns Figma designs into production Laravel screens. A screen is do
 
 - Laravel with Blade for views, layouts and data wiring.
 - Page container: always Bootstrap's `.container` for content width, on every screen (see "Page container" in the frontend rules).
+- Section gaps: the vertical gap between sections matches Figma within 1px at every frame width, measured, one mechanism only (see "Section gaps match Figma" in the frontend rules).
+- CSS files: page-only CSS in `resources/css/screens/<page>.css` named after the page, shared CSS in separate shared files (see "Page CSS and shared CSS are separate files" in the frontend rules).
+- Comments: every Blade, CSS, PHP and script file gets a header (what it is, Figma node), a banner per section, and a short "why" on every derived value, workaround or override, following the `figma-to-web:code-comments` skill.
 - FCP is strict: `figma-check.mjs fcp` must pass the 1.8 s throttled-mobile budget on every screen (see "First Contentful Paint" in the frontend rules).
 - Images: optimized for fast loading (AVIF/WebP, `srcset`, dimensions, lazy below the fold, eager hero) without changing the rendered size; see "Images (fast loading)" in the frontend rules.
 - QA screenshots: save one screenshot per tested width to `qa/<screen>/<section>/w<width>.png` (see the build-section QA step in the skill).

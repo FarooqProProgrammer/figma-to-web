@@ -127,6 +127,10 @@ node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 76
 
 - [`skills/figma-to-laravel/`](skills/figma-to-laravel/SKILL.md): Core end-to-end Figma to Laravel Blade conversion.
 - [`.agents/skills/pixel-perfect-ui/`](.agents/skills/pixel-perfect-ui/SKILL.md): Autonomous iterative visual validation loop and precision discrepancy auditing.
+- [`.agents/skills/match-section-gaps/`](.agents/skills/match-section-gaps/SKILL.md): Section-to-section spacing read from Figma, built with one mechanism and verified by measurement.
+- [`.agents/skills/split-page-and-shared-css/`](.agents/skills/split-page-and-shared-css/SKILL.md): Page-only CSS in a file named after the page, shared CSS in separate files.
+- [`.agents/skills/extract-asset-from-figwright/`](.agents/skills/extract-asset-from-figwright/SKILL.md): Export images, icons and logos from Figma through Figwright.
+- [`.agents/skills/code-comments/`](.agents/skills/code-comments/SKILL.md): Plain-language comment standard (file headers, section banners with Figma node IDs, and the "why" behind derived values).
 - [`.agents/skills/good-css/`](.agents/skills/good-css/SKILL.md): Modern plain CSS techniques (fluid `clamp()`, logical properties, clean layout patterns).
 - [`.agents/skills/css/`](.agents/skills/css/SKILL.md): Semantic HTML5 standards and maintainable CSS architecture.
 - [`.agents/skills/responsive-design/`](.agents/skills/responsive-design/SKILL.md): Container queries, fluid spacing, and mobile touch-target accessibility.
