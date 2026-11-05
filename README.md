@@ -9,7 +9,7 @@ An agentic plugin and workflow for **Google Antigravity** and **Claude Code** th
 1. **Extracts Section Node Styling to JSON First**: Reads Figma frames through the [Figwright](https://github.com/awdr74100/figwright) MCP server and exports the exact styling, layout, typography, fills, and effects of every page section into structured JSON files (`docs/design/<screen>/sections/<name>.json`), along with design tokens and 1x reference images.
 2. **Flexible Styling Setup**:
    - **Tailwind CSS is NOT mandatory**: If the target project uses Tailwind CSS (`tailwind.config.js` or `@tailwindcss/vite`), it maps Figma tokens to `@theme`/tailwind config and uses utility classes.
-   - **Bootstrap**: If configured, it leverages Bootstrap's grid and components with custom token overrides.
+   - **Bootstrap**: Its `.container` is always used for content width (overridden once to the Figma width); its grid and components are used where configured, and custom CSS that clashes with them is removed.
    - **Plain Custom CSS**: If no framework is configured, it generates clean, semantic CSS (`resources/css/tokens.css`, `components/*.css`, `screens/*.css`) using modern vanilla CSS best practices (`good-css` and `css` skills).
 3. **Responsive & Adaptive Architecture**: Builds the widest frame desktop-first, then applies `@media (max-width)` queries and container queries (`@container`), leveraging fluid typography and touch-target accessibility from the integrated `responsive-design` skill.
 4. **Automated Fidelity & Responsive Verification**: Tests fonts, verifies element geometry to within 1 pixel via headless Chrome, performs pixel-diff comparisons against Figma 1x exports, and sweeps viewport widths (320px to 1920px) for overflow, overlap, and clipped text.
@@ -127,6 +127,7 @@ node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 76
 
 - [`skills/figma-to-laravel/`](skills/figma-to-laravel/SKILL.md): Core end-to-end Figma to Laravel Blade conversion.
 - [`.agents/skills/pixel-perfect-ui/`](.agents/skills/pixel-perfect-ui/SKILL.md): Autonomous iterative visual validation loop and precision discrepancy auditing.
+- [`.agents/skills/design-doctor/`](.agents/skills/design-doctor/SKILL.md): Diagnoses why a built screen differs from Figma, groups symptoms into root causes and prescribes the CSS fix (`docs/screens/<screen>-diagnosis.md`).
 - [`.agents/skills/find-design-gaps/`](.agents/skills/find-design-gaps/SKILL.md): Audits a Figma screen for missing frames, states, tokens, assets and accessibility problems before the build, and writes `docs/design/<screen>/gaps.md`.
 - [`.agents/skills/match-section-gaps/`](.agents/skills/match-section-gaps/SKILL.md): Section-to-section spacing read from Figma, built with one mechanism and verified by measurement.
 - [`.agents/skills/split-page-and-shared-css/`](.agents/skills/split-page-and-shared-css/SKILL.md): Page-only CSS in a file named after the page, shared CSS in separate files.

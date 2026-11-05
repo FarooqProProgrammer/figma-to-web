@@ -13,6 +13,9 @@ This project turns Figma designs into production Laravel screens. A screen is do
 - Images: optimized for fast loading (AVIF/WebP, `srcset`, dimensions, lazy below the fold, eager hero) without changing the rendered size; see "Images (fast loading)" in the frontend rules.
 - QA screenshots: save one screenshot per tested width to `qa/<screen>/<section>/w<width>.png` (see the build-section QA step in the skill).
 - Bootstrap conflicts: where a Bootstrap class is used, remove the custom CSS that duplicates or clashes with it, and never reuse Bootstrap class names for custom classes (see "No custom CSS that conflicts with Bootstrap" in the frontend rules).
+- Design gaps: before building, run the `find-design-gaps` skill on the spec and answer or record every blocking gap in `docs/design/<screen>/gaps.md`.
+- Deviations: when a built screen does not match Figma, run the `design-doctor` skill to find the root cause from measurements before changing CSS, and record the result in `docs/screens/<screen>-diagnosis.md`.
+- CSS quality: flat specificity, no `!important`, tokens for repeated values, `:focus-visible` and reduced motion (see "Writing the CSS itself" in the frontend rules).
 - HTML and CSS styling: Tailwind CSS is **not mandatory**. Use Tailwind CSS if configured in the project (`tailwind.config.js`, `@tailwindcss/vite`, etc.). Otherwise, use **custom CSS** (custom properties and media queries) or **Bootstrap**, matching whatever the project environment provides.
 - Vanilla JavaScript, and only where a screen's behaviour needs it (a menu toggle, for example).
 - CSS is bundled by Laravel's default Vite setup.

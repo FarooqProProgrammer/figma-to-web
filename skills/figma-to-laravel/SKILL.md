@@ -50,6 +50,8 @@ Each section JSON (`sections/<section-name>.json`) must capture the exact Figma 
 
 Hand each screen to the `figma-to-web:figma-inspector` agent with its frame URLs and breakpoint labels to generate this folder structure, JSON files, spec, and 1x reference images. Where a value is silent or ambiguous, query that node yourself; do not estimate.
 
+Then run the `find-design-gaps` skill (`.agents/skills/find-design-gaps/SKILL.md`) on the spec and write `docs/design/<screen>/gaps.md`. Ask the user about every blocking gap, and do not start the build while any is open unless the user accepts the proposed defaults.
+
 For several screens, run the inspectors in parallel, then build the foundation from all the specs before building any screen, so the tokens are consistent across them.
 
 ## 2. Build the reusable foundation & tokens first (MANDATORY BEFORE SCREENS)
@@ -137,6 +139,7 @@ Run the tests, then execute the iterative visual validation loop leveraging the 
    - `figma-to-web:fidelity-verifier`: Measures running DOM geometry, font families, computed styles, and compares pixels against Figma 1x exports.
    - `figma-to-web:responsive-auditor`: Sweeps widths from 1920px down to 320px with Playwright, checking for overflow, clipping, or collision.
 2. **Iterative Visual Verification Loop (from `pixel-perfect-ui`)**:
+   - If the screen does not match and the cause is not obvious, run the `design-doctor` skill (`.agents/skills/design-doctor/SKILL.md`) to find the root cause from measurements before editing CSS.
    - Execute headless Chrome check: `node scripts/figma-check.mjs compare` and `measure`.
    - If deviations exist (geometry > 1px, wrong colors, font fallbacks, solid diff regions):
      - Identify offending CSS properties in the component/screen stylesheet.
