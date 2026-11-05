@@ -19,9 +19,36 @@ Turn one screen's Figma frames into a Blade view, its CSS (using Tailwind CSS if
 - **PHP, Composer and Node.** If any is missing, tell the user before writing code. Without a running app nothing can be verified, and unverified code must not be reported as matching the design.
 - **The checking script.** `node "${CLAUDE_PLUGIN_ROOT}/scripts/figma-check.mjs"` screenshots, pixel-diffs, measures and sweeps a page in headless Chrome. If it reports a missing dependency, run the `npm install` command it prints.
 
-## 1. Read the design
+## 1. Extract Figma section node stylings to JSON & generate specs
 
-Hand each screen to the `figma-to-web:figma-inspector` agent with its frame URLs and breakpoint labels. It writes the spec to `docs/design/<screen>.md`, with exact values and the node ID behind each one, and saves a 1x export of each frame to `docs/design/reference/`. Read the spec. Where it is silent or ambiguous on a value, query that node yourself; do not estimate.
+**First and foremost, before writing any Blade or CSS code**: For every page/screen in Figma, inspect and extract the complete node styling of each section and save them into structured JSON files within a dedicated folder hierarchy:
+
+```text
+docs/design/<screen>/
+├── spec.md                     # High-level screen spec & breakpoint hierarchy
+├── tokens.json                 # Extracted variables (colors, typography, spacing, shadows, radii)
+├── components.json             # Component variants and property mappings
+├── sections/                   # Individual section node styling JSONs
+│   ├── header.json
+│   ├── hero.json
+│   ├── features.json
+│   ├── pricing.json
+│   ├── cta.json
+│   └── footer.json
+└── reference/                  # 1x PNG reference exports per frame width
+    ├── <screen>-1440.png
+    └── <screen>-375.png
+```
+
+Each section JSON (`sections/<section-name>.json`) must capture the exact Figma node properties:
+- **Node Metadata**: `nodeId`, `name`, section hierarchy.
+- **Geometry & Auto Layout**: `width`, `height`, `direction` (row/column), `gap`, `padding` (top, right, bottom, left), `alignItems`, `justifyContent`, `wrap`, and sizing modes (`hug`, `fill`, `fixed`).
+- **Typography**: Font family, font weight, font size (px), exact line-height ratio, letter spacing, text alignment, and text content.
+- **Fills & Strokes**: Solid/gradient fills, stroke width, stroke position (inside/outside/center), border radii per corner, opacity, and blend modes.
+- **Effects**: Box shadows, drop shadows, background blurs, layer blurs.
+- **Bound Variables**: Any Figma tokens linked to properties.
+
+Hand each screen to the `figma-to-web:figma-inspector` agent with its frame URLs and breakpoint labels to generate this folder structure, JSON files, spec, and 1x reference images. Where a value is silent or ambiguous, query that node yourself; do not estimate.
 
 For several screens, run the inspectors in parallel, then build the foundation from all the specs before building any screen, so the tokens are consistent across them.
 

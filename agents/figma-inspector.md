@@ -32,13 +32,38 @@ If a tool fails or a node cannot be read, stop and report that. Never fill a gap
 
 ## Reference images
 
-For each frame, export a PNG at scale 1 with `get_screenshot` and save it as `docs/design/reference/<screen>-<frame width>.png`. Confirm that the saved image's pixel width equals the frame's width. If it does not, the export was scaled: export again, or record the scale next to the frame in the spec.
+For each frame, export a PNG at scale 1 with `get_screenshot` and save it as `docs/design/<screen>/reference/<screen>-<frame width>.png` (or `docs/design/reference/<screen>-<frame width>.png`). Confirm that the saved image's pixel width equals the frame's width. If it does not, the export was scaled: export again, or record the scale next to the frame in the spec.
 
 The pixel diff later compares the running screen with these images, so they must show the frame alone, at its natural size.
 
-## What to write
+## What to extract & write
 
-Write `docs/design/<screen>.md` with these sections:
+First, create the structured folder hierarchy for the screen:
+
+```text
+docs/design/<screen>/
+├── spec.md                     # Markdown summary spec
+├── tokens.json                 # Colors, typography, spacing, shadows, radii tokens
+├── components.json             # Component variants and properties
+├── sections/                   # Individual section node styling JSON files
+│   ├── <section-1>.json
+│   └── <section-2>.json
+└── reference/                  # 1x PNG reference exports per frame width
+```
+
+### 1. Section Node Styling JSONs (`sections/<section-name>.json`)
+For every distinct section/container of the page, extract its raw node data into a dedicated JSON file containing:
+- `nodeId`: Figma node ID
+- `section`: Name/slug of the section (e.g. `header`, `hero`, `features`, `pricing`, `footer`)
+- `geometry`: `width`, `height`, `x`, `y`, `constraints`
+- `layout`: Auto-layout parameters (`direction`, `gap`, `paddingTop`, `paddingRight`, `paddingBottom`, `paddingLeft`, `alignItems`, `justifyContent`, `wrap`, `primaryAxisSizingMode`, `counterAxisSizingMode`)
+- `typography`: Per text node font family, font weight, font size, line height ratio, letter spacing, text content, color
+- `styling`: Fills (solid/gradients), strokes (border width, color, strokeAlign), border radii (per corner), opacity, blend mode
+- `effects`: Box shadows, blurs
+- `boundVariables`: Connected Figma tokens
+
+### 2. Design Spec Markdown (`docs/design/<screen>/spec.md` or `docs/design/<screen>.md`)
+Write the overall screen specification with these sections:
 
 - **Frames**: for each breakpoint, the URL, node ID, frame width and height, and the path of its reference image.
 - **Tokens**: every variable and style the frames use, with its Figma name and value: colors, type styles (family, weight, size, line height, letter spacing), spacing, radii, shadows.
@@ -53,4 +78,4 @@ Use the design's own variable and style names. Where a raw value matches a varia
 
 ## What to return
 
-Reply with the path of the spec, the frame widths and reference images you saved, and the Gaps list. The caller reads the file for everything else.
+Reply with the path of the spec, the directory of the section styling JSON files (`sections/*.json`), the frame widths and reference images you saved, and the Gaps list. The caller reads the files for everything else.

@@ -33,6 +33,6 @@ A screen with data needs a fixture that reproduces the content shown in the Figm
 
 ## Docs
 
-- `docs/design/<screen>.md` is the design spec extracted from Figma, and `docs/design/reference/<screen>-<width>.png` are the Figma exports the pixel diff compares against. Both are input: update them by re-reading Figma, never by hand to match the code.
+- `docs/design/<screen>/` holds the design spec: `spec.md`, `tokens.json`, `components.json`, individual section node styling JSON files in `sections/<name>.json`, and 1x reference PNG exports in `reference/<screen>-<width>.png`. All of these are input extracted directly from Figma: update them by re-reading Figma, never by hand to match the code.
 - `docs/screens/<screen>.md` documents the implementation: the Figma link and node ID for each breakpoint, the files that make up the screen, the components it uses, its breakpoints, its derived decisions, its unresolved deviations, and the pixel-diff percentage at each frame width from the last verification.
 - `README.md` explains how to install, run the app, and run the feature and browser tests.

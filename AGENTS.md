@@ -19,12 +19,34 @@ This workspace implements **Figma to Web**: turning Figma frames into production
 
 When tasked with building or updating a screen:
 
-### Step 1: Inspect Figma & Generate Spec
+### Step 1: Extract Figma Section Stylings to JSON & Generate Spec
+- **Mandatory First Step**: Before writing any Blade view or CSS code, extract the node styling of each section for every page into structured JSON files with a clean folder structure:
+  ```text
+  docs/design/<screen>/
+  ├── spec.md                     # Markdown summary spec
+  ├── tokens.json                 # Colors, typography, spacing, shadows, radii tokens
+  ├── components.json             # Components and variants map
+  ├── sections/                   # Individual section node styling JSON files
+  │   ├── header.json
+  │   ├── hero.json
+  │   ├── features.json
+  │   ├── pricing.json
+  │   ├── cta.json
+  │   └── footer.json
+  └── reference/                  # 1x PNG reference exports per frame width
+      ├── <screen>-1440.png
+      └── <screen>-375.png
+  ```
+  Each section JSON (`sections/<section-name>.json`) captures:
+  - Exact `nodeId`, positioning, and auto layout (`direction`, `gap`, `padding`, `alignItems`, `justifyContent`, sizing modes).
+  - Complete typography definitions (family, weight, size, exact line-height ratio, letter-spacing, text content).
+  - Fills (colors, gradients), strokes (border width, color, position), border radii per corner, opacity, blend modes, and effects (box shadows, blurs).
+  - Bound design tokens.
 - Use the **Figwright MCP server** (`@figwright/mcp`, local WebSocket on `127.0.0.1:3055` connected to the Figwright plugin in the Figma desktop app).
 - **Read-Only Guardrail**: Only invoke read tools (`get_design_context`, `token_map`, `component_map`, `icon_map`, `get_screenshot`, `design_diff`). Never alter the Figma file.
 - Inspect the design using the role defined in [`agents/figma-inspector.md`](file:///d:/ai%20agent/figma-to-web/agents/figma-inspector.md).
-- Export 1x reference images to `docs/design/reference/<screen>-<width>.png`.
-- Output the design specification to `docs/design/<screen>.md`.
+- Export 1x reference images to `docs/design/<screen>/reference/<screen>-<width>.png` (or `docs/design/reference/`).
+- Output the design specification to `docs/design/<screen>/spec.md` (or `docs/design/<screen>.md`).
 
 ### Step 2: Build Tokens & Shared Components
 - Build `resources/css/tokens.css` from the spec variables and styles (`--color-*`, `--font-*`, `--space-*`, `--radius-*`, `--shadow-*`).
