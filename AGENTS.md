@@ -21,6 +21,8 @@ This workspace implements **Figma to Web**: turning Figma frames into production
   - `extract-asset-from-figwright`: Extract and optimize SVGs and raster assets into `public/images/<screen>/`.
   - `code-comments`: Structured header and section banner commenting standards across Blade, CSS, and PHP.
   - `use-claude-plugin`: Adapt, bridge, and execute Claude Code plugins, skills, and MCP configs in Antigravity.
+  - `unused-css`: Review stylesheets and eliminate dead or unused CSS rules to reduce bundle sizes.
+  - `bem`: Comprehensive BEM + SASS methodology skill for modular, scalable SCSS architecture and code auditing.
   - `bootstrap-*` suite: Complete Bootstrap 6 setup and customization skills (`bootstrap-v6-install`, `bootstrap-vite`, `bootstrap-webpack`, `bootstrap-parcel`, `bootstrap-npm`, `bootstrap-color-system`, `bootstrap-component`, `bootstrap-component-js`, `bootstrap-utility-api`, `bootstrap-v4-v6-migration`, `bootstrap-v5-v6-migration`).
 - **CSS Translation Reference**: [`skills/figma-to-laravel/references/figma-to-css.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/figma-to-css.md)
 - **CSS & Responsive Reading List**: [`skills/figma-to-laravel/references/css-resources.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/css-resources.md) (MDN, web.dev, Utopia, Can I use)

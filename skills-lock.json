@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "bem": {
+      "source": "marcoscazaux/skills",
+      "sourceType": "github",
+      "skillPath": "bem/SKILL.md",
+      "computedHash": "435a73606a0345c0ce8859e315d99d370aa94e91c007823b32a3a453933ad998"
+    },
     "bootstrap-color-system": {
       "source": "twbs/bootstrap",
       "sourceType": "github",
@@ -84,6 +90,12 @@
       "sourceType": "github",
       "skillPath": "pixel-perfect-ui/SKILL.md",
       "computedHash": "c71df0bf727826d41a0ad812ada79b07913d6ad5fc5cf97c29177cdcb9aeed53"
+    },
+    "unused-css": {
+      "source": "thedaviddias/front-end-checklist",
+      "sourceType": "github",
+      "skillPath": "skills/unused-css/SKILL.md",
+      "computedHash": "66cb4b79f2d0e2b10d0c4df01dfb2711d9a47219754802db35c932696cb78f36"
     }
   }
 }
