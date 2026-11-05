@@ -15,7 +15,7 @@ Your instrument is `node "${CLAUDE_PLUGIN_ROOT}/scripts/figma-check.mjs"`. It dr
 
 ## What to check
 
-At each frame's exact width, in this order:
+Follow the visual precision and auditing loop principles from the [`pixel-perfect-ui`](file:///d:/ai%20agent/figma-to-web/.agents/skills/pixel-perfect-ui/SKILL.md) skill. At each frame's exact width, in this order:
 
 1. **Fonts.** Run `measure` on the screen's text elements and read the `fonts` list. A family reported as unavailable means the browser is using a fallback, which makes every later text measurement meaningless. Report it first and skip the text comparisons for that family.
 2. **Geometry and styles.** Run `measure` with the selectors for the nodes in the spec's layout tree. Compare each element's position and size with the spec, and its computed font, color, background, border, radius, shadow, opacity, padding and gap.

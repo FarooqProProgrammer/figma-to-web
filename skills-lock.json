@@ -12,6 +12,12 @@
       "sourceType": "github",
       "skillPath": "skills/good-css/SKILL.md",
       "computedHash": "8d05f29e9139fd3a0ad1ea3a77f7d0c5076f561a618ea67115cb19f0c382cea7"
+    },
+    "pixel-perfect-ui": {
+      "source": "corlab-tech/skills",
+      "sourceType": "github",
+      "skillPath": "pixel-perfect-ui/SKILL.md",
+      "computedHash": "c71df0bf727826d41a0ad812ada79b07913d6ad5fc5cf97c29177cdcb9aeed53"
     }
   }
 }

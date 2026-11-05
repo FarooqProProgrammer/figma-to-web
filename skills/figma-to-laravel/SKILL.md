@@ -114,11 +114,21 @@ Mark each derived block with a `derived:` comment and list it in the screen's do
 
 Write the feature test, the Dusk responsive test, `docs/screens/<screen>.md`, and the README section on running the app and tests, as the rules describe.
 
-## 6. Verify
+## 6. Verify (Pixel-Perfect Validation Loop)
 
-Run the tests. Then start the `figma-to-web:fidelity-verifier` and `figma-to-web:responsive-auditor` agents in parallel. They are independent checks that measure the running screen themselves, and they only report, so the fixes are yours.
+Run the tests, then execute the iterative visual validation loop leveraging the **`pixel-perfect-ui`** skill (`.agents/skills/pixel-perfect-ui/SKILL.md`) and the verification script:
 
-Fix what they find and run them again. Stop when both come back clean, or when two rounds have made no progress on a deviation. Such a deviation goes in the screen's doc with its reason. It is reported, never quietly accepted, and the reference's last section lists the few kinds that are expected.
+1. **Start verification agents in parallel**:
+   - `figma-to-web:fidelity-verifier`: Measures running DOM geometry, font families, computed styles, and compares pixels against Figma 1x exports.
+   - `figma-to-web:responsive-auditor`: Sweeps widths 320px–1920px checking for overflow, clipping, or collision.
+2. **Iterative Visual Verification Loop (from `pixel-perfect-ui`)**:
+   - Execute headless Chrome check: `node scripts/figma-check.mjs compare` and `measure`.
+   - If deviations exist (geometry > 1px, wrong colors, font fallbacks, solid diff regions):
+     - Identify offending CSS properties in the component/screen stylesheet.
+     - Adjust styles (paddings, line-height ratios, flex alignments, margins).
+     - Re-measure and regenerate the diff.
+     - Repeat until the rendered screen matches the Figma frame to within 1 pixel tolerance.
+3. **Stop conditions**: Both agents come back clean, or two rounds have made no further progress on a specific deviation. Unresolved deviations are recorded in `docs/screens/<screen>.md` with their technical rationale.
 
 ## 7. Report
 

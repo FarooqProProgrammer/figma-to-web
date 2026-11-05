@@ -121,6 +121,7 @@ node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 76
 ## Integrated Skills
 
 - [`skills/figma-to-laravel/`](skills/figma-to-laravel/SKILL.md): Core end-to-end Figma to Laravel Blade conversion.
+- [`.agents/skills/pixel-perfect-ui/`](.agents/skills/pixel-perfect-ui/SKILL.md): Autonomous iterative visual validation loop and precision discrepancy auditing.
 - [`.agents/skills/good-css/`](.agents/skills/good-css/SKILL.md): Modern plain CSS techniques (fluid `clamp()`, logical properties, clean layout patterns).
 - [`.agents/skills/css/`](.agents/skills/css/SKILL.md): Semantic HTML5 standards and maintainable CSS architecture.
 - [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md): Container queries, fluid spacing, and mobile touch-target accessibility.

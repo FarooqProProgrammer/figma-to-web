@@ -10,6 +10,7 @@ This workspace implements **Figma to Web**: turning Figma frames into production
 
 - **Stack**: Laravel + Blade, semantic HTML5, CSS (Tailwind CSS if configured, Bootstrap, or custom CSS), vanilla JS (only when interactivity requires it). **Tailwind CSS is NOT mandatory** — use Tailwind CSS if configured in the project, or use custom CSS / Bootstrap based on project setup.
 - **Skill Definition**: [`skills/figma-to-laravel/SKILL.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/SKILL.md)
+- **Pixel-Perfect Verification**: [`pixel-perfect-ui`](file:///d:/ai%20agent/figma-to-web/.agents/skills/pixel-perfect-ui/SKILL.md) (autonomous iterative visual comparison and precision auditing)
 - **Responsive Architecture**: [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) (fluid typography, container queries, and mobile-first scaling between Figma frames)
 - **CSS Translation Reference**: [`skills/figma-to-laravel/references/figma-to-css.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/figma-to-css.md)
 
