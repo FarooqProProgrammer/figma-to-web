@@ -1,19 +1,19 @@
 ---
 name: use-claude-plugin
-description: Adapt, bridge, install, and execute Claude Code plugins and skills in Google Antigravity. Use whenever the user asks to use, import, convert, or run a Claude plugin or skill in Antigravity, adapt Claude Code extensions or MCP configs, or configure dual-compatibility between Claude Code and Antigravity.
+description: Adapt, bridge, install, and execute Claude Code plugins, skills, commands, agents, and MCP configurations in Codex, OpenCode, or Google Antigravity. Use whenever the user asks to use, import, convert, or run a Claude plugin or skill in these agents, adapt Claude Code extensions or MCP configs, or configure a repository for multiple coding agents.
 ---
 
-# Use Claude Plugin in Antigravity
+# Use Claude Plugins in Codex, OpenCode, and Antigravity
 
-This skill enables Google Antigravity to discover, adapt, install, and execute plugins, skills, MCP servers, and commands created for Anthropic's **Claude Code** agent.
+This skill helps Codex, OpenCode, and Google Antigravity reuse components created for Anthropic's **Claude Code** agent. Choose the target agent first: skills are usually portable, while plugin manifests, MCP settings, commands, hooks, and agent definitions need target-specific wiring.
 
-Both Antigravity and Claude Code share the open agent skills architecture (Markdown runbooks with YAML frontmatter, progressive disclosure, and Model Context Protocol servers). With minimal bridging, virtually any Claude Code plugin can run natively in Antigravity.
+Codex and Claude Code both support skills built around `SKILL.md` with YAML frontmatter. A Claude Code plugin is not itself a drop-in Codex plugin; reuse its portable content and translate configuration and runtime assumptions explicitly.
 
 ---
 
 ## Quick Reference: Component Mapping
 
-| Claude Code Component | Antigravity Equivalent | Action Required |
+| Claude Code Component | Target mapping | Action Required |
 | :--- | :--- | :--- |
 | **`skills/<name>/SKILL.md`** | `.agents/skills/<name>/SKILL.md` or `skills/` | **100% compatible**. Index the path in `.agents/skills.json` or copy into `.agents/skills/`. |
 | **`plugin.json` (or `.claude-plugin/`)** | `.agents/` workspace config or global `~/.gemini/config/plugins/` | Extract `mcpServers` and `skills` paths. |
@@ -21,12 +21,18 @@ Both Antigravity and Claude Code share the open agent skills architecture (Markd
 | **Commands (`commands/<name>.md`)** | `AGENT.md` / `AGENTS.md` Quick Reference | Map command triggers in `AGENT.md`/`AGENTS.md` or invoke the skill directly. |
 | **Rules (`.claude/rules/*.md`)** | `AGENTS.md`, `GEMINI.md`, or `.agents/rules/*.md` | Copy rule files into `.agents/rules/` or incorporate into `AGENTS.md`. |
 | **`${CLAUDE_PLUGIN_ROOT}`** | Relative paths or project root | Replace with relative paths or environment fallback in scripts. |
+| **`skills/<name>/SKILL.md`** | Codex `.agents/skills/<name>/SKILL.md` | Usually reusable; review instructions for Claude-only tools and paths. |
+| **Claude plugin manifest / marketplace** | No direct Codex equivalent | Read the manifest as source metadata; install or invoke the skill and tools using Codex conventions. |
+| **`.mcp.json` / plugin `mcpServers`** | Codex MCP configuration | Configure the server through Codex settings/config; do not assume `.mcp.json` is loaded automatically. |
+| **Claude commands** | Codex skills or `AGENTS.md` guidance | Convert reusable workflows into skills; place repository-wide rules in `AGENTS.md`. |
+| **Claude hooks** | Codex-supported config/hooks, where available | Check the installed Codex version and supported hook events; do not copy `hooks.json` blindly. |
+| **Claude skills and MCP configs** | OpenCode skills, `opencode.json[c]`, commands, agents, and plugins | Translate to OpenCode conventions; see [claude-to-opencode.md](./references/claude-to-opencode.md). |
 
 ---
 
 ## 1. Automated Adaptation (Recommended)
 
-Run the included adapter script to inspect a target Claude plugin and automatically configure Antigravity:
+Run the included adapter script only when the target is Antigravity. It does not configure Codex:
 
 ```bash
 # Run against the current project
@@ -47,12 +53,17 @@ The script:
 
 ## 2. Manual Integration Workflows
 
-### Method A: Workspace Dual-Compatibility (Both Agents in One Repo)
-Use this when you want a repository to work simultaneously in Claude Code and Google Antigravity (like this workspace):
+### Method A: Workspace Dual-Compatibility
+Use this when you want a repository to work in Claude Code and another agent:
 
 1. **Keep Claude structures**:
    - Keep `.claude-plugin/plugin.json`, `skills/`, `commands/`, and `rules/`.
-2. **Add Antigravity discovery configuration**:
+2. **For Antigravity**, add its discovery configuration as documented below.
+3. **For Codex**, put shared skills under `.agents/skills/<skill-name>/SKILL.md` and repository guidance in `AGENTS.md`. Codex discovers skills from `.agents/skills`; no Antigravity `.agents/skills.json` is needed.
+4. **Configure MCP per target agent**. For Codex, add server settings using the active Codex configuration mechanism (user or project config supported by the installed version). Do not copy `.mcp.json` and assume Codex will import it.
+5. **Bridge commands** by turning useful Claude command workflows into skills or documenting them in `AGENTS.md`. Keep Claude-specific frontmatter and tool calls out of shared instructions unless guarded by a target-specific note.
+
+Antigravity discovery configuration:
    - Create `.agents/skills.json` pointing to skill directories:
      ```json
      {
@@ -62,7 +73,7 @@ Use this when you want a repository to work simultaneously in Claude Code and Go
        ]
      }
      ```
-3. **Bridge MCP Servers**:
+Bridge MCP Servers:
    - If the Claude plugin defines MCP servers in `.mcp.json` or `plugin.json`, create `.agents/mcp_config.json`:
      ```json
      {
@@ -74,7 +85,7 @@ Use this when you want a repository to work simultaneously in Claude Code and Go
        }
      }
      ```
-4. **Bridge Commands & Auto-Activation**:
+Bridge Commands & Auto-Activation:
    - Claude exposes `commands/<name>.md` as `/name`. In Antigravity, add a quick reference table and auto-activation rule in `AGENT.md` and `AGENTS.md`:
      ```markdown
      ## Slash Commands Quick Reference
@@ -84,9 +95,9 @@ Use this when you want a repository to work simultaneously in Claude Code and Go
 ---
 
 ### Method B: Standalone Skill Import (Extract a Single Skill)
-If you only need one specific skill from a Claude plugin:
+If you only need one specific skill from a Claude plugin, copy it with its referenced resources to `.agents/skills/<skill-name>/` for Codex or this workspace's Antigravity skill directory. For Codex, user-wide skills can live under `$HOME/.agents/skills/<skill-name>/`.
 
-1. Copy the skill directory from the Claude plugin (`skills/<skill-name>/`) into `.agents/skills/<skill-name>/` (workspace) or `~/.gemini/config/skills/<skill-name>/` (global).
+1. Copy the skill directory from the Claude plugin (`skills/<skill-name>/`) into the target agent's skill directory.
 2. Verify that the skill's `SKILL.md` has valid YAML frontmatter:
    ```yaml
    ---
@@ -120,7 +131,7 @@ To install the Claude plugin as a global Antigravity plugin for all workspaces o
 ### Handling `${CLAUDE_PLUGIN_ROOT}`
 Claude Code scripts often refer to `${CLAUDE_PLUGIN_ROOT}` to locate assets or dependencies.
 - **In Markdown instructions**: Change `node "${CLAUDE_PLUGIN_ROOT}/scripts/foo.mjs"` to `node scripts/foo.mjs` (relative to workspace root) or link with `[foo.mjs](./scripts/foo.mjs)`.
-- **In Node.js scripts**: Use standard Node.js root resolution:
+- **In Node.js scripts**: Resolve paths from the script's own location or provide an explicit target-specific root. For Antigravity scripts, a fallback can be:
   ```javascript
   import path from 'node:path';
   const root = process.env.ANTIGRAVITY_PLUGIN_ROOT 
@@ -130,19 +141,18 @@ Claude Code scripts often refer to `${CLAUDE_PLUGIN_ROOT}` to locate assets or d
 
 ### Handling Shell Differences on Windows
 - Claude Code default instructions often assume a Unix bash shell (`cat > /tmp/...`, `source ...`).
-- In Google Antigravity on Windows, the default shell is **PowerShell**.
-- **Fix**: Convert shell scripts or multi-command bash chains to Node.js scripts (`.mjs`) or PowerShell equivalents (`Get-Content`, `Set-Content`, etc.).
+- On Windows, Codex may use PowerShell or another configured shell; Antigravity commonly uses PowerShell.
+- Prefer portable Node.js or Python scripts, or give shell-specific alternatives when the runtime matters.
 
 ---
 
 ## 4. Verification Checklist
 
 After adapting a Claude plugin:
-- [ ] **Discovery**: Does Antigravity list the skill under available skills?
+- [ ] **Discovery**: Does the selected agent list the skill under available skills?
 - [ ] **Frontmatter**: Does `SKILL.md` contain lowercase hyphenated `name` and descriptive `description`?
-- [ ] **MCP Servers**: Are MCP servers defined in `.agents/mcp_config.json` responding when called?
+- [ ] **MCP Servers**: Is the server configured in the selected agent's supported settings and responding when called?
 - [ ] **Path Resolution**: Do all referenced scripts and examples exist and execute without missing path errors?
 - [ ] **Testing**: Run a prompt matching the skill's trigger description to confirm progressive activation.
 
-For more detailed architectural mapping, see [claude-to-antigravity.md](./references/claude-to-antigravity.md).
-
+For detailed mappings, see [claude-to-antigravity.md](./references/claude-to-antigravity.md), [claude-to-codex.md](./references/claude-to-codex.md), and [claude-to-opencode.md](./references/claude-to-opencode.md).
