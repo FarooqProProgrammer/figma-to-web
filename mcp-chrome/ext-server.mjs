@@ -69,6 +69,7 @@ tool('computer', 'Mouse/keyboard/screenshot. Coordinates are CSS px from the lat
 tool('javascript_tool', 'Run JavaScript in the page (awaited), returns the JSON result', { text: z.string() });
 tool('read_console_messages', 'Console output captured since first use on the tab', { pattern: z.string().optional(), onlyErrors: z.boolean().optional(), clear: z.boolean().optional(), limit: z.number().optional() });
 tool('read_network_requests', 'Network requests captured since first use on the tab', { urlPattern: z.string().optional(), clear: z.boolean().optional(), limit: z.number().optional() });
+tool('emulate', 'Emulate a device viewport on one tab without resizing the window; width 0 resets', { width: z.number(), height: z.number().optional() });
 tool('resize_window', 'Resize the browser window', { width: z.number(), height: z.number() });
 
 listen(Number(process.env.MCP_CHROME_PORT) || 8765); // MCP_CHROME_PORT pins one port (tests)

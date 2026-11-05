@@ -15,7 +15,7 @@ function connect(port) {
   if (socks.has(port)) return;
   const ws = new WebSocket(`ws://127.0.0.1:${port}`);
   socks.set(port, ws);
-  ws.onopen = () => chrome.action.setBadgeText({ text: 'ON' });
+  ws.onopen = badge;
   ws.onmessage = async (e) => {
     const { id, method, params } = JSON.parse(e.data);
     try {
@@ -27,9 +27,24 @@ function connect(port) {
   };
   ws.onclose = () => {
     if (socks.get(port) === ws) socks.delete(port);
-    if (![...socks.values()].some((s) => s.readyState === 1)) chrome.action.setBadgeText({ text: '' });
+    badge();
   };
 }
+const connectedCount = () => [...socks.values()].filter((s) => s.readyState === 1).length;
+function badge() {
+  const n = connectedCount();
+  chrome.action.setBadgeText({ text: n ? 'ON' : 'OFF' });
+  chrome.action.setBadgeBackgroundColor({ color: n ? '#1fa65a' : '#d33' });
+}
+badge();
+// Popup asks for status / a manual reconnect.
+chrome.runtime.onMessage.addListener((m, _s, reply) => {
+  (async () => {
+    if (m.type === 'reconnect') { await scan(); await new Promise((r) => setTimeout(r, 1200)); }
+    reply({ connected: connectedCount() });
+  })();
+  return true;
+});
 // chrome.storage.local "ports" overrides the default range (used by the e2e test to stay isolated).
 const scan = async () => ((await chrome.storage.local.get('ports')).ports ?? PORTS).forEach(connect);
 chrome.storage.onChanged.addListener(scan);
@@ -326,6 +341,13 @@ const handlers = {
     if (urlPattern) a = a.filter((r) => r.url.includes(urlPattern));
     if (clear) logs.net.set(id, []);
     return a.slice(-(limit ?? 100)).map((r) => `${r.status ?? '...'} ${r.method} ${r.url}`).join('\n') || '(none; capture starts when first used on a tab)';
+  },
+  // Per-tab device emulation (no window resize). width 0 resets.
+  async emulate({ width, height, tabId }) {
+    const id = await tabOf(tabId);
+    if (!width) { await dbg(id, 'Emulation.clearDeviceMetricsOverride'); return 'emulation off'; }
+    await dbg(id, 'Emulation.setDeviceMetricsOverride', { width, height: height ?? 800, deviceScaleFactor: 1, mobile: width < 768 });
+    return `emulating ${width}x${height ?? 800}`;
   },
   async resize_window({ width, height, tabId }) {
     const t = await chrome.tabs.get(await tabOf(tabId));
