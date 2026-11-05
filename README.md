@@ -1,108 +1,126 @@
 # Figma to Web
 
-A Claude Code plugin that builds Laravel Blade screens with plain CSS from Figma frames, then checks them against the design with measurements and a pixel diff at every breakpoint.
+An agentic plugin and workflow for **Google Antigravity** and **Claude Code** that turns Figma frames into production Laravel Blade screens with pixel precision, verified against the design with automated measurements and pixel-diff testing at every breakpoint.
 
-## What it does
+---
 
-1. Reads the Figma frames through the [Figwright](https://github.com/awdr74100/figwright) MCP server, which the plugin starts for you, and writes an exact design spec, plus a 1x reference image of each frame.
-2. Builds CSS tokens and Blade components from the design's variables and styles.
-3. Builds each screen at its widest frame, then adds the narrower layouts.
-4. Verifies the result in headless Chrome: fonts loaded, every element within one pixel of the spec, a pixel diff against the Figma export, and a sweep from 320px to 1920px for overflow, clipped text and overlap.
-5. Reports the breakpoints covered, every derived decision, and every deviation it could not resolve.
+## What It Does
 
-Text is the one accepted difference. Figma and browsers rasterise glyphs differently, so text edges differ by a fringe of pixels even when every metric is equal.
+1. **Extracts Section Node Styling to JSON First**: Reads Figma frames through the [Figwright](https://github.com/awdr74100/figwright) MCP server and exports the exact styling, layout, typography, fills, and effects of every page section into structured JSON files (`docs/design/<screen>/sections/<name>.json`), along with design tokens and 1x reference images.
+2. **Flexible Styling Setup**:
+   - **Tailwind CSS is NOT mandatory**: If the target project uses Tailwind CSS (`tailwind.config.js` or `@tailwindcss/vite`), it maps Figma tokens to `@theme`/tailwind config and uses utility classes.
+   - **Bootstrap**: If configured, it leverages Bootstrap's grid and components with custom token overrides.
+   - **Plain Custom CSS**: If no framework is configured, it generates clean, semantic CSS (`resources/css/tokens.css`, `components/*.css`, `screens/*.css`) using modern vanilla CSS best practices (`good-css` and `css` skills).
+3. **Responsive & Adaptive Architecture**: Builds the widest frame desktop-first, then applies `@media (max-width)` queries and container queries (`@container`), leveraging fluid typography and touch-target accessibility from the integrated `responsive-design` skill.
+4. **Automated Fidelity & Responsive Verification**: Tests fonts, verifies element geometry to within 1 pixel via headless Chrome, performs pixel-diff comparisons against Figma 1x exports, and sweeps viewport widths (320px to 1920px) for overflow, overlap, and clipped text.
+5. **Baseline Diff & Full Reporting**: Saves baseline node states with Figwright's `design_diff` and reports all breakpoints covered, derived decisions, and pixel-diff metrics.
+
+---
 
 ## Requirements
 
-- Claude Code.
-- The Figma desktop app, to import the Figwright plugin. The free Figma tier is enough; no Dev Mode seat is needed.
-- Node 20.19 or later (or 22.12 or later), for Figwright and the checking script.
-- Google Chrome or Microsoft Edge, for the checking script.
-- PHP, Composer and a Laravel app (the skill scaffolds one if the folder has none).
+- **Google Antigravity** or **Claude Code**.
+- **Figma desktop app** with the Figwright plugin imported (free Figma tier is sufficient; no Dev Mode seat needed).
+- **Node.js** 20.19+ or 22.12+.
+- **Google Chrome** or **Microsoft Edge** (for headless pixel checks and responsive sweeps).
+- **PHP 8.2+**, **Composer**, and a Laravel application (the skill scaffolds one if missing).
 
-## Install
+---
 
+## Installation & Auto-Loading
+
+### In Google Antigravity
+This repository is pre-configured to auto-load in Antigravity:
+- [`AGENT.md`](AGENT.md) and [`AGENTS.md`](AGENTS.md) automatically instruct the agent to trigger the `figma-to-laravel` workflow whenever a Figma URL or build task is provided.
+- [`.agents/skills.json`](.agents/skills.json) indexes the skill catalog.
+- [`.agents/mcp_config.json`](.agents/mcp_config.json) connects Antigravity to the Figwright MCP server.
+
+### In Claude Code
 From a local copy:
-
-```
+```bash
 claude plugin marketplace add "D:\ai agent\figma-to-web"
 claude plugin install figma-to-web@figma-to-web-marketplace
 ```
 
-Or load it for one session without installing:
-
-```
+Or run for a single session:
+```bash
 claude --plugin-dir "D:\ai agent\figma-to-web"
 ```
 
-The checking script needs its dependencies once per install. It prints the exact command when they are missing:
-
+Install checking script dependencies once:
+```bash
+npm install --prefix scripts
 ```
-npm install --prefix "<plugin folder>/scripts"
-```
 
-## Set up Figwright
+---
 
-The plugin's `.mcp.json` starts the Figwright server (`@figwright/mcp`, pinned to 0.7.0 in `scripts/figwright-mcp.mjs`). Figwright reaches Figma through its own Figma plugin, which you install once:
+## Figwright Setup
 
-1. Download the plugin zip for the same version from the [Figwright releases](https://github.com/awdr74100/figwright/releases) and unzip it.
-2. In the Figma desktop app, choose **Menu → Plugins → Development → Import plugin from manifest…** and pick the unzipped `manifest.json`.
-3. Open the design file and run **Plugins → Development → Figwright**. The panel shows **Connected**.
+The plugin starts the Figwright MCP server (`@figwright/mcp`) over a local WebSocket on `127.0.0.1:3055`.
 
-Keep the Figwright panel open (or use its **Run in background** button) while Claude works. The server and the Figma plugin ship together, so when you raise the pinned version, replace the Figma plugin with the one from the same release.
+1. Download the Figwright plugin zip from [Figwright Releases](https://github.com/awdr74100/figwright/releases) and unzip it.
+2. In the Figma desktop app: **Menu → Plugins → Development → Import plugin from manifest…** and select `manifest.json`.
+3. Open your Figma design and launch **Plugins → Development → Figwright** (status will display **Connected**).
+4. Keep Figwright running in the background. The plugin interacts with Figwright strictly using **read-only** tools.
 
-Figwright runs entirely on your machine, over a WebSocket on `127.0.0.1:3055`. It can edit Figma files as well as read them. This plugin's skill and agents are told to read only, and Claude Code's tool approvals are what enforce that, so do not blanket-approve Figwright's write tools.
+---
 
-## Use
+## Commands & Skills
 
-| Command | What it does |
+| Command / Trigger | What It Does |
 |---|---|
 | `/figma-to-web:build-screen <figma-url>…` | Builds one screen end to end, one URL per breakpoint frame |
-| `/figma-to-web:extract-tokens <figma-url>…` | Builds only the tokens and shared components |
-| `/figma-to-web:verify-fidelity <screen>` | Measures and pixel-diffs a screen against its frames, and fixes deviations |
-| `/figma-to-web:check-responsive <screen>` | Sweeps a screen across widths and fixes what breaks |
+| `/figma-to-web:extract-tokens <figma-url>…` | Extracts tokens, section JSONs, and shared components |
+| `/figma-to-web:verify-fidelity <screen>` | Measures and pixel-diffs a screen against its Figma frames |
+| `/figma-to-web:check-responsive <screen>` | Sweeps viewport widths (320px–1920px) and catches breaking layouts |
 
-Sharing a figma.com URL and asking for it to be built also triggers the skill. With no URL, the commands use the frame selected in Figma.
+*Pasting a `figma.com` URL in chat also auto-triggers the workflow.*
 
-## What is in the plugin
+---
 
-| Path | Purpose |
-|---|---|
-| `skills/figma-to-laravel/SKILL.md` | The order of work, from reading the design to the final report |
-| `skills/figma-to-laravel/references/figma-to-css.md` | How each Figma property becomes CSS, and what cannot match |
-| `agents/figma-inspector.md` | Reads Figma and writes the spec and reference images |
-| `agents/fidelity-verifier.md` | Independent check of a screen against its frames; reports only |
-| `agents/responsive-auditor.md` | Independent sweep across viewport widths; reports only |
-| `commands/` | The four slash commands above |
-| `rules/` | Project conventions. Plugins cannot ship rules, so the skill copies these into the project's `.claude/rules/` on first use |
-| `scripts/figma-check.mjs` | The checking script: `compare`, `measure` and `sweep` |
-| `.mcp.json`, `scripts/figwright-mcp.mjs` | Start the Figwright MCP server, on Windows, macOS and Linux |
+## Design Artifacts Folder Structure
 
-## The checking script
+Before writing Blade views or stylesheets, the plugin creates a structured design directory:
 
-It can be run by hand against any URL:
-
+```text
+docs/design/<screen>/
+├── spec.md                     # Markdown summary spec
+├── tokens.json                 # Colors, typography, spacing, shadows, radii tokens
+├── components.json             # Components & variants map
+├── sections/                   # Individual section node styling JSON files
+│   ├── header.json
+│   ├── hero.json
+│   ├── features.json
+│   ├── pricing.json
+│   ├── cta.json
+│   └── footer.json
+└── reference/                  # 1x PNG reference exports per frame width
+    ├── <screen>-1440.png
+    └── <screen>-375.png
 ```
+
+---
+
+## Verification Tooling (`scripts/figma-check.mjs`)
+
+You can execute headless Chrome checks manually or via the verification agents:
+
+```bash
+# 1. Pixel diff against Figma 1x export
 node scripts/figma-check.mjs compare --url http://127.0.0.1:8000/pricing --width 1440 --ref docs/design/reference/pricing-1440.png --out tmp/diff
+
+# 2. Measure geometry and computed styles
 node scripts/figma-check.mjs measure --url http://127.0.0.1:8000/pricing --width 1440 --selectors ".hero__title,.button"
-node scripts/figma-check.mjs sweep   --url http://127.0.0.1:8000/pricing --also 767,768,769 --out tmp/sweep
+
+# 3. Viewport width sweep (320px to 1920px)
+node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 767,768,769 --out tmp/sweep
 ```
 
-- `compare` saves `rendered.png` and `diff.png`, and prints the mismatch percentage and the regions of the page that differ.
-- `measure` prints each element's position, size and computed styles, and whether each font family is really available.
-- `sweep` prints, for each width with a problem, the elements causing horizontal overflow, clipped content and overlapping siblings.
+---
 
-Run its self-test with `npm test` inside `scripts/`.
+## Integrated Skills
 
-## What goes into your project
-
-- `.claude/rules/figma-*.md`: the conventions, copied from the plugin.
-- `docs/design/`: the spec and reference image for each screen.
-- `docs/screens/`: how each screen is built, with its derived decisions and unresolved deviations.
-- The Laravel code: routes, controllers, Blade views and components, CSS, feature tests and Dusk tests.
-
-## Assumptions
-
-- The stack is Laravel, Blade and plain CSS bundled by Vite, with no CSS framework.
-- CSS is desktop-first: the widest frame is the base and narrower layouts are `max-width` queries.
-- Laravel Dusk is used for the project's responsive tests.
+- [`skills/figma-to-laravel/`](skills/figma-to-laravel/SKILL.md): Core end-to-end Figma to Laravel Blade conversion.
+- [`.agents/skills/good-css/`](.agents/skills/good-css/SKILL.md): Modern plain CSS techniques (fluid `clamp()`, logical properties, clean layout patterns).
+- [`.agents/skills/css/`](.agents/skills/css/SKILL.md): Semantic HTML5 standards and maintainable CSS architecture.
+- [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md): Container queries, fluid spacing, and mobile touch-target accessibility.

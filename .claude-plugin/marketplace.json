@@ -1,11 +1,12 @@
 {
   "name": "figma-to-web-marketplace",
-  "owner": { "name": "Jumppace" },
+  "owner": { "name": "FarooqProProgrammer" },
   "plugins": [
     {
       "name": "figma-to-web",
       "source": "./",
-      "description": "Build Laravel Blade screens with plain CSS from Figma frames, then measure and pixel-diff them against the design at every breakpoint."
+      "version": "0.2.0",
+      "description": "Build Laravel Blade screens with plain CSS, Tailwind CSS, or Bootstrap from Figma frames, extract section node stylings to JSON, then measure and pixel-diff them against the design at every breakpoint."
     }
   ]
 }
