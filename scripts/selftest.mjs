@@ -1,7 +1,7 @@
 // Self-check for figma-check.mjs against local fixture pages. Run: npm test
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -66,6 +66,18 @@ try {
 
   const clean = run('sweep', '--url', original, '--from', '320', '--to', '800', '--step', '240');
   assert.equal(clean.clean, true);
+
+  // sweep --all saves one screenshot per tested width, even when clean, optionally of one element.
+  const shots = join(dir, 'shots');
+  const all = run('sweep', '--url', original, '--from', '320', '--to', '800', '--step', '240', '--out', shots, '--all');
+  assert.equal(all.screenshots.length, all.tested.length);
+  assert.ok(all.screenshots.every((p) => existsSync(p)));
+
+  // fcp: a trivial page paints well inside a generous budget; an impossible budget fails the command.
+  const painted = run('fcp', '--url', original, '--budget', '60000');
+  assert.equal(painted.pass, true);
+  assert.ok(painted.fcpMs > 0 && painted.runs.length === 3);
+  assert.throws(() => run('fcp', '--url', original, '--budget', '1'));
 
   console.log('figma-check self-test passed');
 } finally {

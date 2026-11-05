@@ -58,10 +58,14 @@ npm install --prefix scripts
 
 The plugin starts the Figwright MCP server (`@figwright/mcp`) over a local WebSocket on `127.0.0.1:3055`.
 
-1. Download the Figwright plugin zip from [Figwright Releases](https://github.com/awdr74100/figwright/releases) and unzip it.
+0. **Node.js 20.19+ or 22.12+** is required (the server runs through `npx`; Node 18, 21 and 22.0–22.11 are not supported). The server, `@figwright/mcp@0.7.0`, is pinned in `scripts/figwright-mcp.mjs` and needs no manual install.
+1. Download `figwright-plugin-v0.7.0.zip` from the [latest Figwright release](https://github.com/awdr74100/figwright/releases/latest) and unzip it. The plugin and server must come from the same release.
 2. In the Figma desktop app: **Menu → Plugins → Development → Import plugin from manifest…** and select `manifest.json`.
 3. Open your Figma design and launch **Plugins → Development → Figwright** (status will display **Connected**).
 4. Keep Figwright running in the background. The plugin interacts with Figwright strictly using **read-only** tools.
+5. Run `/figma-to-web:setup-figwright` to check Node and confirm the link with Figwright's `ping`. If the server is missing, run `/mcp` and **Reconnect** figwright.
+
+To upgrade, raise the version in `scripts/figwright-mcp.mjs`, replace the plugin folder with the new release's `manifest.json` and `dist`, and reconnect. Figwright's optional `figma-build` skill writes to the Figma canvas, so it is deliberately not installed here.
 
 ---
 
@@ -72,6 +76,7 @@ The plugin starts the Figwright MCP server (`@figwright/mcp`) over a local WebSo
 | `/figma-to-web:build-screen <figma-url>…` | Builds one screen end to end, one URL per breakpoint frame |
 | `/figma-to-web:extract-tokens <figma-url>…` | Extracts tokens, section JSONs, and shared components |
 | `/figma-to-web:verify-fidelity <screen>` | Measures and pixel-diffs a screen against its Figma frames |
+| `/figma-to-web:setup-figwright` | Checks Node, the pinned Figwright server and the Figma plugin connection |
 | `/figma-to-web:check-responsive <screen>` | Sweeps viewport widths (1920px down to 320px) and catches breaking layouts |
 
 *Pasting a `figma.com` URL in chat also auto-triggers the workflow.*

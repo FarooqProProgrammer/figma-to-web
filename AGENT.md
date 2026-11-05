@@ -63,6 +63,8 @@ When tasked with building or updating a screen:
   - Screen views must consume these reusable tokens and components rather than re-declaring them.
 
 ### Step 3: Implement Screen & Responsive Reflow
+- **Build-section QA (desktop to mobile)**: build one section at a time; after each, QA it at the widest frame (`compare` + `measure`), add its narrower-frame rules, then sweep 1920px down to 320px and finish at mobile before starting the next section.
+- **QA screenshots**: each QA pass saves a screenshot at every dimension tested to `qa/<screen>/<section>/w<width>.png` (`sweep --out qa/<screen>/<section> --all --selector <section>`), including widths that pass.
 - Implement the widest Figma frame first in `resources/views/screens/<name>.blade.php` and `resources/css/screens/<name>.css`.
 - Add routes in `routes/web.php` and controllers if data is required.
 - Write a design fixture/seeder reproducing the exact Figma frame data for faithful pixel diffing.
@@ -86,6 +88,9 @@ When tasked with building or updating a screen:
   # Selector geometry and computed style measurement
   node scripts/figma-check.mjs measure --url http://127.0.0.1:8000/<route> --width <width> --selectors "<selectors>"
 
+  # First Contentful Paint (strict: must pass the 1.8 s budget on throttled mobile)
+  node scripts/figma-check.mjs fcp --url http://127.0.0.1:8000/<route> --width 375
+
   # Viewport width sweep (Playwright, 1920px down to 320px)
   node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/<route> --also <breakpoint-widths> --out tmp/sweep
   ```
@@ -104,6 +109,7 @@ Map user commands to the corresponding workflow:
 - `/figma-to-web:build-screen <figma-url>...` -> Implement screen end-to-end ([commands/build-screen.md](file:///d:/ai%20agent/figma-to-web/commands/build-screen.md))
 - `/figma-to-web:extract-tokens <figma-url>...` -> Extract tokens & shared components only ([commands/extract-tokens.md](file:///d:/ai%20agent/figma-to-web/commands/extract-tokens.md))
 - `/figma-to-web:verify-fidelity <screen>` -> Measure & diff rendered screen against Figma ([commands/verify-fidelity.md](file:///d:/ai%20agent/figma-to-web/commands/verify-fidelity.md))
+- `/figma-to-web:setup-figwright` -> Install and verify the Figwright MCP server and Figma plugin ([commands/setup-figwright.md](file:///d:/ai%20agent/figma-to-web/commands/setup-figwright.md))
 - `/figma-to-web:check-responsive <screen>` -> Sweep viewport widths 1920px down to 320px ([commands/check-responsive.md](file:///d:/ai%20agent/figma-to-web/commands/check-responsive.md))
 
 ---

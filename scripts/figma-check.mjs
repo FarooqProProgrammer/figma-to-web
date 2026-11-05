@@ -20,10 +20,16 @@ measure   Report geometry, computed styles and font availability.
           --width <px>       viewport width (required)
           --selectors <a,b>  comma-separated CSS selectors (required)
 
+fcp       Measure First Contentful Paint on a cold load with throttled mobile network and CPU.
+          --width <px>       viewport width (default 375)
+          --budget <ms>      fail (exit 1) when the median of 3 runs is slower (default 1800)
+
 sweep     Look for overflow, clipped content and overlap across viewport widths.
           --from <px> --to <px> --step <px>   defaults 320, 1920, 40; runs widest first
           --also <a,b>       extra widths, such as each breakpoint and one pixel either side
-          --out <dir>        save a screenshot at each width that has a problem`;
+          --out <dir>        save a screenshot at each width that has a problem
+          --all              with --out, save a screenshot at every width tested (w<width>.png)
+          --selector <css>   with --out, screenshot only that element (a section) instead of the page`;
 
 const fail = (message) => {
   console.error(message);
@@ -54,6 +60,8 @@ const { values: args, positionals } = parseArgs({
     to: { type: 'string', default: '1920' },
     step: { type: 'string', default: '40' },
     also: { type: 'string', default: '' },
+    all: { type: 'boolean', default: false },
+    budget: { type: 'string', default: '1800' },
   },
 });
 const command = positionals[0];
@@ -273,20 +281,26 @@ async function sweep() {
   const browser = await launch();
   const page = await openPage(browser, tested[0]);
   const problems = [];
+  const screenshots = [];
   for (const width of tested) {
     await page.setViewportSize({ width, height: 900 });
     await settle(page);
     const found = await page.evaluate(inspectLayout);
-    if (!found.overflowPx && !found.clipped.length && !found.overlaps.length) continue;
-    if (args.out !== '.') {
+    const ok = !found.overflowPx && !found.clipped.length && !found.overlaps.length;
+    if (args.out !== '.' && (args.all || !ok)) {
       mkdirSync(args.out, { recursive: true });
-      found.screenshot = join(args.out, `w${width}.png`);
-      await page.screenshot({ path: found.screenshot, fullPage: true, animations: 'disabled', caret: 'hide' });
+      const path = join(args.out, `w${width}.png`);
+      const shot = { path, animations: 'disabled', caret: 'hide' };
+      if (args.selector) await page.locator(args.selector).first().screenshot(shot);
+      else await page.screenshot({ ...shot, fullPage: true });
+      screenshots.push(path);
+      found.screenshot = path;
     }
+    if (ok) continue;
     problems.push({ width, ...found });
   }
   await browser.close();
-  return { tested, clean: problems.length === 0, problems };
+  return { tested, clean: problems.length === 0, problems, screenshots };
 }
 
 // Runs in the page.
@@ -356,6 +370,48 @@ function inspectLayout() {
   };
 }
 
-const commands = { compare, measure, sweep };
+// Lab estimate: Lighthouse-style mobile throttling (1.6 Mbps, 150 ms RTT, 4x CPU slowdown), cold cache each run.
+async function fcp() {
+  const width = args.width ? number('width') : 375;
+  const budget = number('budget');
+  const browser = await launch();
+  const runs = [];
+  for (let i = 0; i < 3; i++) {
+    const context = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+    const page = await context.newPage();
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Network.enable');
+    await cdp.send('Network.emulateNetworkConditions', {
+      offline: false,
+      latency: 150,
+      downloadThroughput: (1.6 * 1024 * 1024) / 8,
+      uploadThroughput: (750 * 1024) / 8,
+    });
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await page.goto(args.url, { waitUntil: 'load', timeout: 60000 }).catch((error) => {
+      fail(`Could not load ${args.url}: ${String(error.message).split('\n')[0]}. Is the app running?`);
+    });
+    const ms = await page.evaluate(
+      () =>
+        new Promise((done) => {
+          setTimeout(() => done(null), 10000);
+          new PerformanceObserver((list) => {
+            const entry = list.getEntriesByName('first-contentful-paint')[0];
+            if (entry) done(entry.startTime);
+          }).observe({ type: 'paint', buffered: true });
+        }),
+    );
+    await context.close();
+    if (ms === null) fail('The page never painted any content (no first-contentful-paint).');
+    runs.push(Math.round(ms));
+  }
+  await browser.close();
+  const median = [...runs].sort((a, b) => a - b)[1];
+  const pass = median <= budget;
+  if (!pass) process.exitCode = 1;
+  return { width, runs, fcpMs: median, budgetMs: budget, pass };
+}
+
+const commands = { compare, measure, sweep, fcp };
 if (!commands[command] || !args.url) fail(USAGE);
 console.log(JSON.stringify(await commands[command](), null, 2));

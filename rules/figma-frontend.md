@@ -86,6 +86,31 @@ How each Figma property becomes CSS (auto layout, strokes, fills, effects, text,
 - Above the widest frame, the content keeps the frame's width and centers.
 - Do not put a fixed height on anything that contains text. The frame's height is a result of its content at that width, and fixing it clips the text at narrower widths.
 
+## First Contentful Paint (strict)
+
+First Contentful Paint must be fast on every screen. The budget is **1.8 s or less on throttled mobile** (1.6 Mbps, 150 ms RTT, 4x CPU slowdown, cold cache), measured with `node scripts/figma-check.mjs fcp --url <page> --width 375` and again at the widest frame. The command fails when the median of three runs is over budget; a screen is not finished while it fails. Run it on a production build (`npm run build`, not the Vite dev server) and after `php artisan optimize`.
+
+- **Server-render everything above the fold** in Blade. No content that waits for JavaScript to appear.
+- **No render-blocking JavaScript**: scripts are `defer` or `type="module"`, and none sit in the head without it. Load Bootstrap's JavaScript only when a component on the page needs it. No third-party scripts, widgets or trackers above the fold.
+- **Small CSS**: one stylesheet through `@vite`, nothing unused. If Bootstrap is used only for `.container` and the grid, build only those Bootstrap partials, not the whole `bootstrap.css`. No CSS `@import` chains that load files one after another.
+- **Fonts**: self-hosted `woff2`, `font-display: swap`, only the weights the page uses, and `<link rel="preload" as="font" type="font/woff2" crossorigin>` for the one or two used above the fold. `preconnect` to any third-party origin that cannot be avoided. Re-check text widths after font loading changes, because fidelity depends on the right font.
+- **Above-the-fold images** follow the Images rule: not lazy, `fetchpriority="high"` on the hero, correct size, modern format.
+- **Delivery**: Brotli or gzip on, long-lived cache headers for hashed Vite assets, and no redirects before the page.
+- When FCP is over budget, find the cause before changing anything: open the throttled load in the browser, look at what blocks the first paint (CSS, a font, a script, the HTML response), fix that, and run `fcp` again.
+
+## Images (fast loading)
+
+Optimizing an image must never change how big it renders: the displayed box still matches the Figma frame, and `compare` and `measure` are re-run after any image change.
+
+- **Format**: icons, logos and illustrations that are vectors in Figma are SVG. Photos and raster art are served as AVIF with WebP and the original JPEG/PNG as fallbacks, through `<picture>` with `<source type="image/avif">`, then `image/webp`, then the `<img>`. Never ship a raw multi-megabyte export.
+- **Size**: export or generate widths that match the rendered size at the frame widths (and 2x for retina), then let the browser choose with `srcset` (width descriptors) and an accurate `sizes`. Keep to a few variants, for example 480, 768, 1200 and 1920 wide. Do not serve a 3000px file into a 400px box.
+- **Dimensions**: every `<img>` has `width` and `height` attributes (the file's intrinsic size) and CSS `max-width: 100%; height: auto`, so the browser reserves space and the page does not shift while images load.
+- **Below the fold**: `loading="lazy"` and `decoding="async"`. This needs the `width`/`height` above, or the page jumps as images arrive.
+- **Above the fold**: the hero or first visible image (usually the Largest Contentful Paint element) is never lazy. Give it `fetchpriority="high"`, and preload it when its URL is known early. Use `fetchpriority="high"` on one or two images at most. Confirm which element is the LCP before optimizing; it can be a heading.
+- **Backgrounds**: a decorative image set with CSS `background-image` cannot use `srcset`; use an `<img>` or `<picture>` with `object-fit: cover` for any image that carries weight, and `image-set()` only for small decoration.
+- **Laravel**: do the resizing and conversion at build time or on upload, not on every request: Intervention Image (resize, `webp`/`avif` encoding) and then Spatie `image-optimizer` (compression only, no conversion), or Spatie Media Library conversions for uploaded media. Static design assets can be converted once and committed under `public/images/<screen>/`.
+- **Alt text**: `alt` stays as in the Markup rules; `alt=""` for decoration.
+
 ## Markup
 
 Semantic landmarks (`header`, `nav`, `main`, `footer`), one `h1` per screen, heading levels in order, `alt` text on meaningful images and `alt=""` on decorative ones, links for navigation and buttons for actions, and a visible `:focus-visible` style on everything interactive.

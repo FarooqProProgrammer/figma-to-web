@@ -91,9 +91,21 @@ If tokens and components already exist in the codebase, reuse them. When a Figma
 
 Add the route, the controller if the screen has data, the Blade view and styling (via Tailwind utility classes, Bootstrap classes, or dedicated `screens/<name>.css`). Translate auto layout into flexbox as the reference describes; do not reproduce coordinates, since auto layout is what tells you how the screen should reflow. Export assets through Figwright into `public/images/<screen>/`: `save_image_fills` gives the original uploaded images, and `icon_map` finds icons the project already has before any are exported again.
 
-Render the frame's own content. If the screen has data, write the design fixture now, so the page shows the same text, item counts and images as the frame. Without it the comparison in step 6 measures the content, not your CSS.
+Render the frame's own content. Serve images as the "Images (fast loading)" rule says: AVIF/WebP with fallback, `srcset`/`sizes`, `width`/`height`, lazy below the fold, and an eager `fetchpriority="high"` hero. If the screen has data, write the design fixture now, so the page shows the same text, item counts and images as the frame. Without it the comparison in step 6 measures the content, not your CSS.
 
-Check as you go. After each major section, run the script's `compare` against the frame's reference image and fix what the diff shows before building the next section. Differences are cheap to find while they are few.
+### Build-section QA, from desktop to mobile
+
+Build and check one section at a time, in page order. A section is not done, and the next one does not start, until it passes this loop:
+
+1. **Build** the section at the widest frame, from the shared tokens, text classes, `.container` and components.
+2. **Desktop QA**: run `compare` against the widest frame's reference image and `measure` on the section's selectors; fix every deviation over one pixel.
+3. **Step down**: for each narrower frame, add that section's `max-width` rules (step 4), then run `compare` and `measure` at that frame's width.
+4. **Sweep**: run `sweep` from 1920px down to 320px (with each breakpoint and one pixel either side in `--also`) and fix any overflow, clipping or overlap that involves this section.
+5. **Mobile last**: finish at 320px and the narrowest frame. Check touch targets of at least 44px, text that still wraps like the frame, and no sideways scroll.
+
+**QA screenshots:** Every QA pass saves a screenshot at each dimension tested into the `qa/` folder, as `qa/<screen>/<section>/w<width>.png` (for example `qa/home/hero/w1920.png`, `w1440.png`, `w768.png`, `w375.png`, `w320.png`), including widths that pass. Use `sweep --out qa/<screen>/<section> --all --selector <section selector> --also <breakpoint-widths>`; add `--all` always, because by default only widths with a problem are saved. Re-running a section overwrites its files, so the folder always shows the latest state.
+
+Only then move on. A bug found in section 5 is cheap; the same bug found after the whole page is built is spread across every section.
 
 ## 4. Make it responsive
 
@@ -131,8 +143,9 @@ Run the tests, then execute the iterative visual validation loop leveraging the 
      - Adjust styles (paddings, line-height ratios, flex alignments, margins).
      - Re-measure and regenerate the diff.
      - Repeat until the rendered screen matches the Figma frame to within 1 pixel tolerance.
-3. **Any later component fix or redesign**: rerun the Playwright sweep from 1920px down to 320px on a page that renders it, and keep fixing until it is clean.
-4. **Stop conditions**: Both agents come back clean, or two rounds have made no further progress on a specific deviation. Unresolved deviations are recorded in `docs/screens/<screen>.md` with their technical rationale.
+3. **FCP (strict)**: run `node scripts/figma-check.mjs fcp --url <page> --width 375` (and at the widest frame) on a production build. It must pass the 1.8 s budget; fix what blocks the first paint and re-run, as the "First Contentful Paint" rule describes.
+4. **Any later component fix or redesign**: rerun the Playwright sweep from 1920px down to 320px on a page that renders it, and keep fixing until it is clean.
+5. **Stop conditions**: Both agents come back clean, or two rounds have made no further progress on a specific deviation. Unresolved deviations are recorded in `docs/screens/<screen>.md` with their technical rationale.
 
 ## 7. Report
 
