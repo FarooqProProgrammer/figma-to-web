@@ -2,7 +2,21 @@
   "mcpServers": {
     "figwright": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/figwright-mcp.mjs"]
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/figwright-mcp.mjs"
+      ]
+    },
+    "chrome": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp-chrome/server.mjs"
+      ]
+    },
+    "chrome-ext": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp-chrome/ext-server.mjs"
+      ]
     }
   }
 }

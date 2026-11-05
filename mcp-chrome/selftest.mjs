@@ -1,0 +1,12 @@
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import assert from 'node:assert';
+const c = new Client({ name: 't', version: '0' });
+await c.connect(new StdioClientTransport({ command: 'node', args: ['server.mjs'], env: { ...process.env, CHROME_HEADLESS: '1' } }));
+const tools = (await c.listTools()).tools.map((t) => t.name);
+assert(tools.includes('navigate') && tools.includes('screenshot'));
+await c.callTool({ name: 'tab_new', arguments: { url: 'data:text/html,<h1>hello mcp</h1>' } });
+const r = await c.callTool({ name: 'get_page_text', arguments: {} });
+assert.match(r.content[0].text, /hello mcp/);
+console.log('ok', tools.length, 'tools');
+await c.close(); process.exit(0);
