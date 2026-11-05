@@ -13,6 +13,14 @@ Tailwind CSS is **not mandatory**. Use the styling system configured in the targ
 - **Bootstrap**: If configured, use Bootstrap's grid and utilities, overriding tokens with custom CSS or SCSS variables to match the Figma spec.
 - **Custom CSS**: If neither is used, follow the plain CSS file layout below.
 
+## Page container (strict)
+
+Always use Bootstrap's `.container` for page content width, in every project and on every screen, whatever styling system is otherwise used. Each section's content sits inside one `.container` (a full-bleed background goes on the outer section element, with the `.container` inside it); never write a custom wrapper or a hand-rolled `max-width; margin: 0 auto` for this. If Bootstrap is not installed, install it and load its CSS before the project CSS. Bootstrap's default container widths do not match Figma, so override the container in one place (e.g. `.container { max-width: <Figma content width + side gutter>; --bs-gutter-x: <2 x Figma side padding>; }`) in a stylesheet loaded after Bootstrap, taking the numbers from the Figma frame, and confirm with `figma-check.mjs measure` that the content edge matches at every frame width. Bootstrap sets `max-width` per breakpoint, so the override has to win at each of them.
+
+## No custom CSS that conflicts with Bootstrap
+
+When a Bootstrap class is used for something (`.container`, `.row`, `.col-*`, `.d-flex`, `.btn`, spacing or text utilities), delete every custom CSS rule that does the same job or could clash with it: a custom wrapper with `max-width` and `margin: 0 auto`, a hand-written grid or flex row, a duplicate `.btn` or `.card`, and any rule that re-sets `display`, `padding`, `margin`, `width` or `gap` on an element that already carries the Bootstrap class. One concern has one source: Bootstrap's class or the custom class, never both. Never define a custom class with a Bootstrap class name (`.container`, `.row`, `.col`, `.btn`, `.card`, `.badge`, `.type-body`, `.d-*`, `.m-*`, `.p-*`) except the single deliberate token override of that class described above; name custom classes with a distinct prefix or name instead (e.g. `.type-body`, `.ui-button`). Before finishing a screen, search the CSS for rules that target a Bootstrap class name or style an element that also has a Bootstrap utility, and remove or merge them. After removing, re-run `measure` and the sweep, because Bootstrap's own values now apply.
+
 ## File layout (for custom CSS projects)
 
 ```
@@ -39,6 +47,12 @@ Make something a component when it is a component in Figma or appears in more th
 1. **Design Tokens**: Every color, font style, spacing unit, corner radius, and shadow used in Figma must be declared in `tokens.css` (or Tailwind `@theme`). Never hardcode hex codes or raw pixel sizes inside section stylesheets.
 2. **Base Styles**: Element defaults, resets, and font antialiasing are set once in `base.css`.
 3. **Component Primitives**: Elements that recur across screens or sections (buttons, badges, pills, form inputs, cards) must be built as standalone Blade components (`resources/views/components/`) and component styles (`resources/css/components/`) before page-level views are written. Sections must simply consume these components.
+
+## Shared text styles
+
+One text style, one class: when the same font size, weight, line height and letter spacing appear in more than one section, define it once as a shared typography class (`.type-h1`, `.type-body`, `.type-caption`, named after the Figma text style) in `base.css` or `typography.css`, and reuse it in every section. Never re-declare `font-size` in each section's stylesheet. Section CSS only adds what is different (color, margin, alignment). The same applies to any repeated value set: spacing wrappers, container widths, section padding, and card or button styles become one class or component, not copies.
+
+Before adding a rule to a section, search the existing CSS for the same values. If a class already has them, use it; if two sections need the same new value, create the shared class instead of two section-specific ones.
 
 ## Tokens
 

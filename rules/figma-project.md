@@ -5,6 +5,8 @@ This project turns Figma designs into production Laravel screens. A screen is do
 ## Stack
 
 - Laravel with Blade for views, layouts and data wiring.
+- Page container: always Bootstrap's `.container` for content width, on every screen (see "Page container" in the frontend rules).
+- Bootstrap conflicts: where a Bootstrap class is used, remove the custom CSS that duplicates or clashes with it, and never reuse Bootstrap class names for custom classes (see "No custom CSS that conflicts with Bootstrap" in the frontend rules).
 - HTML and CSS styling: Tailwind CSS is **not mandatory**. Use Tailwind CSS if configured in the project (`tailwind.config.js`, `@tailwindcss/vite`, etc.). Otherwise, use **custom CSS** (custom properties and media queries) or **Bootstrap**, matching whatever the project environment provides.
 - Vanilla JavaScript, and only where a screen's behaviour needs it (a menu toggle, for example).
 - CSS is bundled by Laravel's default Vite setup.
@@ -35,7 +37,7 @@ Build the screens that were asked for. Add a token or component only when one of
 
 Always establish the reusable foundation first:
 1. Extract design tokens (colors, typography, spacing, radii, shadows) into `tokens.css` or the project's theme config.
-2. Build base element defaults and typography in `base.css`.
+2. Build base element defaults and typography in `base.css`, including one shared class per repeated text style (see "Shared text styles" in the frontend rules).
 3. Create reusable UI primitives (buttons, badges, inputs, cards) as Blade components before building screen sections.
 No section may hardcode values or recreate component patterns that belong in the foundation.
 

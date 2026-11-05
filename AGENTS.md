@@ -55,6 +55,9 @@ When tasked with building or updating a screen:
      - Colors (`--color-*`), Typography scale (`--font-*` with `rem` sizes, `calc()` line-height ratios, `em` letter-spacing), Spacing (`--space-*`), Border Radii (`--radius-*`), and Elevation/Shadows (`--shadow-*`).
   2. **Base Styles** (`resources/css/base.css`):
      - Box-sizing reset, font antialiasing (`-webkit-font-smoothing: antialiased`), body defaults, and baseline element typography.
+     - **Page container (strict)**: always use Bootstrap's `.container` for content width in every section, with its width and gutter overridden once to match the Figma content width; no custom wrappers.
+     - **No Bootstrap conflicts**: where a Bootstrap class is used, delete the custom CSS that duplicates or clashes with it (custom wrappers, grids, `.btn`, `.card`, margins or padding on elements already carrying a utility). Never name a custom class like a Bootstrap class; use a distinct prefix.
+     - **Shared text classes**: if the same font size/style is used in more than one section, define one reusable class (e.g. `.type-h2`, `.type-body`) and reuse it everywhere; never repeat `font-size` per section. Same for any repeated spacing, container or card style.
   3. **Reusable Blade Components & Primitives**:
      - Buttons (`<x-button>`, `.btn`, `.btn--primary`, `.btn--outline`, focus/active states), Badges/Pills (`<x-badge>`), Form Controls (inputs, selects), and Cards (`<x-card>`).
   - Screen views must consume these reusable tokens and components rather than re-declaring them.
