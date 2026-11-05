@@ -1,0 +1,13 @@
+{
+  "name": "figma-to-web-scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node selftest.mjs"
+  },
+  "dependencies": {
+    "pixelmatch": "^7.1.0",
+    "playwright-core": "^1.50.0",
+    "pngjs": "^7.0.0"
+  }
+}

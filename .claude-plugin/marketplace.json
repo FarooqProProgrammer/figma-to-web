@@ -1,0 +1,11 @@
+{
+  "name": "figma-to-web-marketplace",
+  "owner": { "name": "Jumppace" },
+  "plugins": [
+    {
+      "name": "figma-to-web",
+      "source": "./",
+      "description": "Build Laravel Blade screens with plain CSS from Figma frames, then measure and pixel-diff them against the design at every breakpoint."
+    }
+  ]
+}
