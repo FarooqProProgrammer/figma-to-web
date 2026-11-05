@@ -127,6 +127,7 @@ node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 76
 
 - [`skills/figma-to-laravel/`](skills/figma-to-laravel/SKILL.md): Core end-to-end Figma to Laravel Blade conversion.
 - [`.agents/skills/pixel-perfect-ui/`](.agents/skills/pixel-perfect-ui/SKILL.md): Autonomous iterative visual validation loop and precision discrepancy auditing.
+- [`.agents/skills/find-design-gaps/`](.agents/skills/find-design-gaps/SKILL.md): Audits a Figma screen for missing frames, states, tokens, assets and accessibility problems before the build, and writes `docs/design/<screen>/gaps.md`.
 - [`.agents/skills/match-section-gaps/`](.agents/skills/match-section-gaps/SKILL.md): Section-to-section spacing read from Figma, built with one mechanism and verified by measurement.
 - [`.agents/skills/split-page-and-shared-css/`](.agents/skills/split-page-and-shared-css/SKILL.md): Page-only CSS in a file named after the page, shared CSS in separate files.
 - [`.agents/skills/extract-asset-from-figwright/`](.agents/skills/extract-asset-from-figwright/SKILL.md): Export images, icons and logos from Figma through Figwright.

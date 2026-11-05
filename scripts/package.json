@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node selftest.mjs"
+    "test": "node selftest.mjs",
+    "test:responsive": "node --test responsive.test.mjs"
   },
   "dependencies": {
     "pixelmatch": "^7.1.0",

@@ -87,6 +87,18 @@ Name tokens after the Figma variable or style they come from: `--color-*`, `--fo
 
 How each Figma property becomes CSS (auto layout, strokes, fills, effects, text, images) is in the figma-to-web plugin's `figma-to-css.md` reference, which the `figma-to-laravel` skill loads.
 
+## Writing the CSS itself
+
+- Keep specificity flat: style with a single class (`.hero__title`, BEM-style with the project's prefix), never IDs or tag-qualified selectors like `div.card`. Later rules then override earlier ones by order alone, so no fight breaks out.
+- No `!important`. The one exception is a deliberate utility such as `.is-hidden`. If a rule needs it, the selector order or specificity is wrong; fix that.
+- Nest at most 3 levels (native CSS nesting included). Nested `&` is compiled with `:is()` semantics, so specificity can differ from the flat selector you expect.
+- Any value used twice is a custom property, defined once (tokens, or a component-scoped variable that wraps a token).
+- Use logical properties (`margin-inline`, `padding-block`) for layout spacing and alignment. Keep physical ones for things that never flip, such as shadow offsets.
+- Interactive controls get a visible `:focus-visible` style, and animations are wrapped or reduced under `@media (prefers-reduced-motion: reduce)`. Figma rarely draws these, so list them as derived decisions.
+- Layers (`@layer`) are optional. If used, declare the order once (`reset, tokens, base, layout, components, utilities`), and remember unlayered styles beat every layer, including Bootstrap if it is imported into one.
+- Before using `:has()`, `@container`, subgrid or `dvh`, check browser support against the project's targets.
+- Reading list for CSS and responsive design: the plugin's `skills/figma-to-laravel/references/css-resources.md`.
+
 ## Responsive
 
 - Every component or screen you design or fix gets a Playwright sweep from 1920px down to 320px before it is called done, on a page that renders it: `node scripts/figma-check.mjs sweep --url <page> --also <breakpoint-widths> --out tmp/sweep`. Fix what it reports and run it again until it is clean.

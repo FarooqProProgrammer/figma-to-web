@@ -13,6 +13,9 @@ This workspace implements **Figma to Web**: turning Figma frames into production
 - **Pixel-Perfect Verification**: [`pixel-perfect-ui`](file:///d:/ai%20agent/figma-to-web/.agents/skills/pixel-perfect-ui/SKILL.md) (autonomous iterative visual comparison and precision auditing)
 - **Responsive Architecture**: [`responsive-design`](file:///d:/ai%20agent/figma-to-web/.agents/skills/responsive-design/SKILL.md) (fluid typography, container queries, and mobile-first scaling between Figma frames)
 - **CSS Translation Reference**: [`skills/figma-to-laravel/references/figma-to-css.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/figma-to-css.md)
+- **CSS & Responsive Reading List**: [`skills/figma-to-laravel/references/css-resources.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/css-resources.md) (MDN, web.dev, Utopia, Can I use)
+- **Plugin Flow (start and end)**: [`docs/plugin-flow.md`](file:///d:/ai%20agent/figma-to-web/docs/plugin-flow.md)
+- **Custom skills** (`.agents/skills/`): `find-design-gaps` (audit the design for missing frames, states, tokens before building), `match-section-gaps`, `split-page-and-shared-css`, `extract-asset-from-figwright`, `code-comments`.
 
 ---
 
@@ -48,6 +51,7 @@ When tasked with building or updating a screen:
 - Inspect the design using the role defined in [`agents/figma-inspector.md`](file:///d:/ai%20agent/figma-to-web/agents/figma-inspector.md).
 - Export 1x reference images to `docs/design/<screen>/reference/<screen>-<width>.png` (or `docs/design/reference/`).
 - Output the design specification to `docs/design/<screen>/spec.md` (or `docs/design/<screen>.md`).
+- **Gap check**: run the [`find-design-gaps`](file:///d:/ai%20agent/figma-to-web/.agents/skills/find-design-gaps/SKILL.md) skill on the spec and write `docs/design/<screen>/gaps.md`. Do not start the build while blocking gaps are unanswered, unless the user accepts the proposed defaults.
 
 ### Step 2: Build Reusable Foundation & Primitives First (Mandatory Before Screens)
 - **Strict Foundation Rule**: Never build individual sections or views with hardcoded values. Extract and implement the shared foundation at the top level first:
@@ -94,6 +98,7 @@ When tasked with building or updating a screen:
   # Viewport width sweep (Playwright, 1920px down to 320px)
   node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/<route> --also <breakpoint-widths> --out tmp/sweep
   ```
+- Plugin self-checks (in `scripts/`): `npm test` (tool self-test) and `npm run test:responsive` (Playwright responsive cases: sweep 1920px to 320px, stacking, 44px targets, container width). Copy a case and point `--url` at a real screen to reuse it.
 - **Every component or screen you design or fix gets this sweep before it is called done**: Playwright (through `figma-check.mjs sweep`) from 1920px down to 320px, on a page that renders it. Fix what it reports and run it again until it is clean.
 - Follow the auditing criteria defined in [`agents/fidelity-verifier.md`](file:///d:/ai%20agent/figma-to-web/agents/fidelity-verifier.md) and [`agents/responsive-auditor.md`](file:///d:/ai%20agent/figma-to-web/agents/responsive-auditor.md).
 
