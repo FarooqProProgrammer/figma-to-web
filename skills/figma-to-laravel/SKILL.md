@@ -120,7 +120,7 @@ Run the tests, then execute the iterative visual validation loop leveraging the 
 
 1. **Start verification agents in parallel**:
    - `figma-to-web:fidelity-verifier`: Measures running DOM geometry, font families, computed styles, and compares pixels against Figma 1x exports.
-   - `figma-to-web:responsive-auditor`: Sweeps widths 320px–1920px checking for overflow, clipping, or collision.
+   - `figma-to-web:responsive-auditor`: Sweeps widths from 1920px down to 320px with Playwright, checking for overflow, clipping, or collision.
 2. **Iterative Visual Verification Loop (from `pixel-perfect-ui`)**:
    - Execute headless Chrome check: `node scripts/figma-check.mjs compare` and `measure`.
    - If deviations exist (geometry > 1px, wrong colors, font fallbacks, solid diff regions):
@@ -128,7 +128,8 @@ Run the tests, then execute the iterative visual validation loop leveraging the 
      - Adjust styles (paddings, line-height ratios, flex alignments, margins).
      - Re-measure and regenerate the diff.
      - Repeat until the rendered screen matches the Figma frame to within 1 pixel tolerance.
-3. **Stop conditions**: Both agents come back clean, or two rounds have made no further progress on a specific deviation. Unresolved deviations are recorded in `docs/screens/<screen>.md` with their technical rationale.
+3. **Any later component fix or redesign**: rerun the Playwright sweep from 1920px down to 320px on a page that renders it, and keep fixing until it is clean.
+4. **Stop conditions**: Both agents come back clean, or two rounds have made no further progress on a specific deviation. Unresolved deviations are recorded in `docs/screens/<screen>.md` with their technical rationale.
 
 ## 7. Report
 

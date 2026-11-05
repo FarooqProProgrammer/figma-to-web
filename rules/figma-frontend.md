@@ -9,6 +9,7 @@ paths:
 ## Styling approach
 Tailwind CSS is **not mandatory**. Use the styling system configured in the target project:
 - **Tailwind CSS**: If configured (`tailwind.config.js` or `@tailwindcss/vite`), map Figma tokens to Tailwind config/`@theme` and use Tailwind utility classes and component classes in Blade templates, using arbitrary values/custom CSS only where exact pixel fidelity demands it.
+  - Tailwind v4 (the Laravel 12 starter default) has no `tailwind.config.js`: declare Figma tokens in an `@theme` block in `resources/css/app.css` and load the CSS with `@vite`. It detects Blade files on its own; add an `@source` line only for a directory it does not scan, such as published pagination views. Check the project's installed version before assuming v3 or v4.
 - **Bootstrap**: If configured, use Bootstrap's grid and utilities, overriding tokens with custom CSS or SCSS variables to match the Figma spec.
 - **Custom CSS**: If neither is used, follow the plain CSS file layout below.
 
@@ -58,9 +59,10 @@ How each Figma property becomes CSS (auto layout, strokes, fills, effects, text,
 
 ## Responsive
 
+- Every component or screen you design or fix gets a Playwright sweep from 1920px down to 320px before it is called done, on a page that renders it: `node scripts/figma-check.mjs sweep --url <page> --also <breakpoint-widths> --out tmp/sweep`. Fix what it reports and run it again until it is clean.
 - Desktop-first. The base styles are the widest Figma frame, and narrower layouts go in `max-width` media queries. This keeps designer-specified styles unconditional and puts anything derived inside a query where it is easy to find.
 - Breakpoints come from the Figma frames. Switch to the narrower frame's layout at the width where the wider layout stops fitting, which is usually wider than the narrower frame itself. Record each chosen value as a derived decision.
-- Follow the [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) skill principles:
+- Follow the `figma-to-web:responsive-design` skill principles:
   - Use container queries (`@container`) for self-contained components (e.g. cards, sidebars, grid cells) so their responsive behavior is independent of viewport width.
   - Employ fluid typography (`clamp(...)`) and relative spacing where appropriate to smooth out transitions between distant breakpoint frames.
   - Ensure touch targets on interactive controls are at least 44x44px on mobile viewports.

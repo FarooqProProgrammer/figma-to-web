@@ -21,7 +21,7 @@ measure   Report geometry, computed styles and font availability.
           --selectors <a,b>  comma-separated CSS selectors (required)
 
 sweep     Look for overflow, clipped content and overlap across viewport widths.
-          --from <px> --to <px> --step <px>   defaults 320, 1920, 40
+          --from <px> --to <px> --step <px>   defaults 320, 1920, 40; runs widest first
           --also <a,b>       extra widths, such as each breakpoint and one pixel either side
           --out <dir>        save a screenshot at each width that has a problem`;
 
@@ -268,7 +268,7 @@ async function sweep() {
   const widths = new Set(args.also.split(',').map(Number).filter((n) => n > 0));
   for (let w = from; w <= to; w += step) widths.add(w);
   widths.add(to);
-  const tested = [...widths].sort((a, b) => a - b);
+  const tested = [...widths].sort((a, b) => b - a); // widest first: desktop down to mobile
 
   const browser = await launch();
   const page = await openPage(browser, tested[0]);

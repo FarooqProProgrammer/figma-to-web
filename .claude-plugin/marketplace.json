@@ -5,7 +5,7 @@
     {
       "name": "figma-to-web",
       "source": "./",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "Build Laravel Blade screens with plain CSS, Tailwind CSS, or Bootstrap from Figma frames, extract section node stylings to JSON, then measure and pixel-diff them against the design at every breakpoint."
     }
   ]

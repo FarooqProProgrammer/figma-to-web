@@ -19,7 +19,7 @@ Call only tools that read. Figwright can also edit the Figma file, and nothing i
 
 Then, for each frame:
 
-1. `get_design_context` with detail `full` and `dedupeComponents: true`. This tree is the source of truth for layout, values and variable bindings. Read a frame that is too large for one call section by section, by node ID. Never limit the depth of a subtree the engineer will build from, and re-read any node that came back deduplicated or truncated.
+1. `get_design_context` with detail `full` and `dedupeComponents: true`. This tree is the source of truth for layout, values and variable bindings. Read a frame that is too large for one call section by section, by node ID: list the frame's top-level children and their node IDs first, then read each section on its own. Never limit the depth of a subtree the engineer will build from, and re-read any node that came back deduplicated or truncated.
 2. `token_map` for the variables and color styles, including their values in each mode.
 3. `component_map`, and `get_component_api` on each component, for the variants and properties.
 4. `icon_map` and the image fills, for the assets list.

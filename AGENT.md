@@ -11,7 +11,7 @@ This workspace implements **Figma to Web**: turning Figma frames into production
 - **Stack**: Laravel + Blade, semantic HTML5, CSS (Tailwind CSS if configured, Bootstrap, or custom CSS), vanilla JS (only when interactivity requires it). **Tailwind CSS is NOT mandatory** — use Tailwind CSS if configured in the project, or use custom CSS / Bootstrap based on project setup.
 - **Skill Definition**: [`skills/figma-to-laravel/SKILL.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/SKILL.md)
 - **Pixel-Perfect Verification**: [`pixel-perfect-ui`](file:///d:/ai%20agent/figma-to-web/.agents/skills/pixel-perfect-ui/SKILL.md) (autonomous iterative visual comparison and precision auditing)
-- **Responsive Architecture**: [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) (fluid typography, container queries, and mobile-first scaling between Figma frames)
+- **Responsive Architecture**: [`responsive-design`](file:///d:/ai%20agent/figma-to-web/.agents/skills/responsive-design/SKILL.md) (fluid typography, container queries, and mobile-first scaling between Figma frames)
 - **CSS Translation Reference**: [`skills/figma-to-laravel/references/figma-to-css.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/figma-to-css.md)
 
 ---
@@ -63,7 +63,7 @@ When tasked with building or updating a screen:
 - Implement the widest Figma frame first in `resources/views/screens/<name>.blade.php` and `resources/css/screens/<name>.css`.
 - Add routes in `routes/web.php` and controllers if data is required.
 - Write a design fixture/seeder reproducing the exact Figma frame data for faithful pixel diffing.
-- Add narrower layouts inside `@media (max-width: ...px)` queries. Integrate the [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) skill:
+- Add narrower layouts inside `@media (max-width: ...px)` queries. Integrate the [`responsive-design`](file:///d:/ai%20agent/figma-to-web/.agents/skills/responsive-design/SKILL.md) skill:
   - Use container queries (`@container`) for self-contained components.
   - Employ fluid typography and spacing where appropriate to avoid abrupt jumps between distant breakpoints.
   - Maintain 44x44px minimum mobile touch targets.
@@ -83,9 +83,10 @@ When tasked with building or updating a screen:
   # Selector geometry and computed style measurement
   node scripts/figma-check.mjs measure --url http://127.0.0.1:8000/<route> --width <width> --selectors "<selectors>"
 
-  # Viewport width sweep (320px to 1920px)
+  # Viewport width sweep (Playwright, 1920px down to 320px)
   node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/<route> --also <breakpoint-widths> --out tmp/sweep
   ```
+- **Every component or screen you design or fix gets this sweep before it is called done**: Playwright (through `figma-check.mjs sweep`) from 1920px down to 320px, on a page that renders it. Fix what it reports and run it again until it is clean.
 - Follow the auditing criteria defined in [`agents/fidelity-verifier.md`](file:///d:/ai%20agent/figma-to-web/agents/fidelity-verifier.md) and [`agents/responsive-auditor.md`](file:///d:/ai%20agent/figma-to-web/agents/responsive-auditor.md).
 
 ### Step 6: Save Baseline & Final Report
@@ -100,7 +101,7 @@ Map user commands to the corresponding workflow:
 - `/figma-to-web:build-screen <figma-url>...` -> Implement screen end-to-end ([commands/build-screen.md](file:///d:/ai%20agent/figma-to-web/commands/build-screen.md))
 - `/figma-to-web:extract-tokens <figma-url>...` -> Extract tokens & shared components only ([commands/extract-tokens.md](file:///d:/ai%20agent/figma-to-web/commands/extract-tokens.md))
 - `/figma-to-web:verify-fidelity <screen>` -> Measure & diff rendered screen against Figma ([commands/verify-fidelity.md](file:///d:/ai%20agent/figma-to-web/commands/verify-fidelity.md))
-- `/figma-to-web:check-responsive <screen>` -> Sweep viewport widths 320px-1920px ([commands/check-responsive.md](file:///d:/ai%20agent/figma-to-web/commands/check-responsive.md))
+- `/figma-to-web:check-responsive <screen>` -> Sweep viewport widths 1920px down to 320px ([commands/check-responsive.md](file:///d:/ai%20agent/figma-to-web/commands/check-responsive.md))
 
 ---
 

@@ -50,9 +50,10 @@ try {
   const wide = fixture('d.html', `<main><div class="wide" style="width:500px;height:20px"></div></main>`);
   const swept = run('sweep', '--url', wide, '--from', '320', '--to', '800', '--step', '80', '--also', '499,500');
   const overflowing = swept.problems.map((p) => p.width);
-  assert.deepEqual(overflowing, [320, 400, 480, 499]);
-  assert.equal(swept.problems[0].overflowPx, 180);
-  assert.equal(swept.problems[0].offenders[0].element, 'main > div.wide');
+  assert.deepEqual(swept.tested[0], 800); // widest first
+  assert.deepEqual(overflowing, [499, 480, 400, 320]);
+  assert.equal(swept.problems.at(-1).overflowPx, 180);
+  assert.equal(swept.problems.at(-1).offenders[0].element, 'main > div.wide');
 
   const messy = fixture(
     'e.html',

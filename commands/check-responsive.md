@@ -1,5 +1,5 @@
 ---
-description: Sweep a screen from 320px to wide desktop for overflow, clipping and overlap, and fix what is found
+description: Sweep a screen or component from 1920px down to 320px for overflow, clipping and overlap, and fix what is found
 argument-hint: <screen-name>
 ---
 

@@ -72,7 +72,7 @@ The plugin starts the Figwright MCP server (`@figwright/mcp`) over a local WebSo
 | `/figma-to-web:build-screen <figma-url>…` | Builds one screen end to end, one URL per breakpoint frame |
 | `/figma-to-web:extract-tokens <figma-url>…` | Extracts tokens, section JSONs, and shared components |
 | `/figma-to-web:verify-fidelity <screen>` | Measures and pixel-diffs a screen against its Figma frames |
-| `/figma-to-web:check-responsive <screen>` | Sweeps viewport widths (320px–1920px) and catches breaking layouts |
+| `/figma-to-web:check-responsive <screen>` | Sweeps viewport widths (1920px down to 320px) and catches breaking layouts |
 
 *Pasting a `figma.com` URL in chat also auto-triggers the workflow.*
 
@@ -112,7 +112,7 @@ node scripts/figma-check.mjs compare --url http://127.0.0.1:8000/pricing --width
 # 2. Measure geometry and computed styles
 node scripts/figma-check.mjs measure --url http://127.0.0.1:8000/pricing --width 1440 --selectors ".hero__title,.button"
 
-# 3. Viewport width sweep (320px to 1920px)
+# 3. Viewport width sweep (Playwright, 1920px down to 320px)
 node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 767,768,769 --out tmp/sweep
 ```
 
@@ -124,4 +124,4 @@ node scripts/figma-check.mjs sweep --url http://127.0.0.1:8000/pricing --also 76
 - [`.agents/skills/pixel-perfect-ui/`](.agents/skills/pixel-perfect-ui/SKILL.md): Autonomous iterative visual validation loop and precision discrepancy auditing.
 - [`.agents/skills/good-css/`](.agents/skills/good-css/SKILL.md): Modern plain CSS techniques (fluid `clamp()`, logical properties, clean layout patterns).
 - [`.agents/skills/css/`](.agents/skills/css/SKILL.md): Semantic HTML5 standards and maintainable CSS architecture.
-- [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md): Container queries, fluid spacing, and mobile touch-target accessibility.
+- [`.agents/skills/responsive-design/`](.agents/skills/responsive-design/SKILL.md): Container queries, fluid spacing, and mobile touch-target accessibility.
