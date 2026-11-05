@@ -2,8 +2,9 @@
   "mcpServers": {
     "figwright": {
       "command": "node",
-      "args": ["scripts/figwright-mcp.mjs"]
+      "args": [
+        "scripts/figwright-mcp.mjs"
+      ]
     }
   }
 }
-
