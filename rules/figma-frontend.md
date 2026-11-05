@@ -53,6 +53,11 @@ How each Figma property becomes CSS (auto layout, strokes, fills, effects, text,
 
 - Desktop-first. The base styles are the widest Figma frame, and narrower layouts go in `max-width` media queries. This keeps designer-specified styles unconditional and puts anything derived inside a query where it is easy to find.
 - Breakpoints come from the Figma frames. Switch to the narrower frame's layout at the width where the wider layout stops fitting, which is usually wider than the narrower frame itself. Record each chosen value as a derived decision.
+- Follow the [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) skill principles:
+  - Use container queries (`@container`) for self-contained components (e.g. cards, sidebars, grid cells) so their responsive behavior is independent of viewport width.
+  - Employ fluid typography (`clamp(...)`) and relative spacing where appropriate to smooth out transitions between distant breakpoint frames.
+  - Ensure touch targets on interactive controls are at least 44x44px on mobile viewports.
+  - Avoid fixed pixel widths that cause horizontal viewport overflow (`scrollWidth > innerWidth`).
 - A media query changes only what differs. When a narrower layout stops using a flex property the wider one set (`flex`, `align-self`, a fixed width), reset it explicitly, or it leaks through the cascade.
 - Custom properties cannot be used in media query conditions. List the breakpoints in a comment at the top of `tokens.css` and repeat the literal values in each query.
 - Above the widest frame, the content keeps the frame's width and centers.

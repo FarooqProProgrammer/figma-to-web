@@ -46,14 +46,19 @@ Check as you go. After each major section, run the script's `compare` against th
 
 ## 4. Make it responsive
 
-For each narrower frame, add a `max-width` block that changes only what differs from the wider layout.
+For each narrower frame, add a `max-width` block that changes only what differs from the wider layout. Integrate the **`responsive-design`** skill (`~/.agents/skills/responsive-design/SKILL.md`) for intermediate widths and component adaptation:
 
-Where the designer gave no frame for a breakpoint, derive it conservatively:
-
-- Keep type styles and tokens from the nearest frame that exists.
-- Stack multi-column auto layouts in reading order.
-- Let "fill" elements shrink, and keep "fixed" elements fixed until they no longer fit.
-- Introduce no visual style the design does not already contain.
+- **Figma breakpoint mappings**: Anchor layout switches at widths dictated by the Figma frames.
+- **Fluid & Adaptive principles** (from `responsive-design` skill):
+  - Use container queries (`@container`) for self-contained components that adapt across different grid columns or viewport widths.
+  - Apply fluid values and clamp scales where appropriate to prevent abrupt jumps between distant breakpoints.
+  - Ensure mobile touch targets meet the 44x44px accessibility baseline.
+  - Avoid fixed pixel widths that trigger horizontal scrolling or overflow (`overflow-x`).
+- **Conservative derivation**: Where the designer gave no frame for a breakpoint, derive it conservatively:
+  - Keep type styles and tokens from the nearest frame that exists.
+  - Stack multi-column auto layouts in reading order.
+  - Let "fill" elements shrink, and keep "fixed" elements fixed until they no longer fit.
+  - Introduce no visual style the design does not already contain.
 
 Mark each derived block with a `derived:` comment and list it in the screen's doc.
 

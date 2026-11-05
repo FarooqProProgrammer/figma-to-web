@@ -10,6 +10,7 @@ This workspace implements **Figma to Web**: turning Figma frames into production
 
 - **Stack**: Laravel + Blade, semantic HTML5, CSS (Tailwind CSS if configured, Bootstrap, or custom CSS), vanilla JS (only when interactivity requires it). **Tailwind CSS is NOT mandatory** — use Tailwind CSS if configured in the project, or use custom CSS / Bootstrap based on project setup.
 - **Skill Definition**: [`skills/figma-to-laravel/SKILL.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/SKILL.md)
+- **Responsive Architecture**: [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) (fluid typography, container queries, and mobile-first scaling between Figma frames)
 - **CSS Translation Reference**: [`skills/figma-to-laravel/references/figma-to-css.md`](file:///d:/ai%20agent/figma-to-web/skills/figma-to-laravel/references/figma-to-css.md)
 
 ---
@@ -30,11 +31,15 @@ When tasked with building or updating a screen:
 - Font sizes in `rem` (`px / 16`), line heights as exact ratios (`calc(22 / 14)`), letter spacing in `em` (`percent / 100`), other dimensions in `px`.
 - Build reusable Blade components (`resources/views/components/<name>.blade.php` and `resources/css/components/<name>.css`).
 
-### Step 3: Implement Screen (Desktop-First)
+### Step 3: Implement Screen & Responsive Reflow
 - Implement the widest Figma frame first in `resources/views/screens/<name>.blade.php` and `resources/css/screens/<name>.css`.
 - Add routes in `routes/web.php` and controllers if data is required.
 - Write a design fixture/seeder reproducing the exact Figma frame data for faithful pixel diffing.
-- Add narrower layouts inside `@media (max-width: ...px)` queries. Mark any derived layout decisions with `/* derived: ... */`.
+- Add narrower layouts inside `@media (max-width: ...px)` queries. Integrate the [`responsive-design`](file:///C:/Users/farooq/.agents/skills/responsive-design/SKILL.md) skill:
+  - Use container queries (`@container`) for self-contained components.
+  - Employ fluid typography and spacing where appropriate to avoid abrupt jumps between distant breakpoints.
+  - Maintain 44x44px minimum mobile touch targets.
+  - Mark any derived layout decisions with `/* derived: ... */`.
 
 ### Step 4: Write Tests & Documentation
 - Write Feature test in `tests/Feature/Screens/<Name>Test.php` calling `$this->withoutVite()`.
